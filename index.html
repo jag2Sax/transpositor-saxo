@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transpositor & Escalas - Piano y Saxofón</title>
+    <title>Jag2Sax Transpositor - Piano y Saxofón</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,9 +28,7 @@
     <!-- Babel CDN for JSX processing -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS Animations and Key Glow -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -44,37 +42,32 @@
             scrollbar-width: none;
         }
 
-        /* Green blinking animation with 50% fill opacity for active sax keys */
-        @keyframes greenBlink {
+        /* 50% Transparent Green Blinking Key Effect for Sax Fingerings */
+        @keyframes keyBlinkGreen {
             0%, 100% {
                 fill: rgba(34, 197, 94, 0.55);
-                stroke: #22c55e;
+                stroke: #4ade80;
                 stroke-width: 2.5px;
-                filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.9));
+                filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.8));
             }
             50% {
-                fill: rgba(34, 197, 94, 0.15);
-                stroke: #16a34a;
+                fill: rgba(34, 197, 94, 0.2);
+                stroke: #22c55e;
                 stroke-width: 1.5px;
                 filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.3));
             }
         }
-        .sax-key-active {
-            animation: greenBlink 1.1s infinite ease-in-out;
-        }
-        .sax-key-inactive {
-            fill: #334155;
-            stroke: #64748b;
-            stroke-width: 1.5px;
+
+        .key-active-green {
+            animation: keyBlinkGreen 1.2s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen transition-colors duration-300">
+<body class="bg-slate-950 text-slate-100 min-h-screen transition-colors duration-300">
     <div id="root"></div>
 
     <script type="text/babel">
 
-        // Pitch classes in chromatic sequence
         const CHROMATIC_PITCHES = [
             { id: 0, defaultName: 'C', altName: 'C' },
             { id: 1, defaultName: 'C#', altName: 'Db' },
@@ -90,32 +83,31 @@
             { id: 11, defaultName: 'B', altName: 'B' }
         ];
 
-        // Piano Key Options (Concert Pitch)
-        const PIANO_KEYS = [
-            { key: 'C', pitch: 0, type: 'natural' },
-            { key: 'C#', pitch: 1, type: 'sharp' },
-            { key: 'Db', pitch: 1, type: 'flat' },
-            { key: 'D', pitch: 2, type: 'natural' },
-            { key: 'Eb', pitch: 3, type: 'flat' },
-            { key: 'E', pitch: 4, type: 'natural' },
-            { key: 'F', pitch: 5, type: 'natural' },
-            { key: 'F#', pitch: 6, type: 'sharp' },
-            { key: 'Gb', pitch: 6, type: 'flat' },
-            { key: 'G', pitch: 7, type: 'natural' },
-            { key: 'Ab', pitch: 8, type: 'flat' },
-            { key: 'A', pitch: 9, type: 'natural' },
-            { key: 'Bb', pitch: 10, type: 'flat' },
-            { key: 'B', pitch: 11, type: 'natural' }
+        const INPUT_KEYS = [
+            { key: 'C', pitch: 0 },
+            { key: 'C#', pitch: 1 },
+            { key: 'Db', pitch: 1 },
+            { key: 'D', pitch: 2 },
+            { key: 'Eb', pitch: 3 },
+            { key: 'E', pitch: 4 },
+            { key: 'F', pitch: 5 },
+            { key: 'F#', pitch: 6 },
+            { key: 'Gb', pitch: 6 },
+            { key: 'G', pitch: 7 },
+            { key: 'Ab', pitch: 8 },
+            { key: 'A', pitch: 9 },
+            { key: 'Bb', pitch: 10 },
+            { key: 'B', pitch: 11 }
         ];
 
-        // Saxophone definitions
         const SAXOPHONES = [
             {
                 id: 'soprano',
                 name: 'Saxo Soprano',
                 key: 'Bb',
-                offset: 2, // Major 2nd up
-                desc: 'Transposición en Bb (+1 Tono arriba)',
+                offsetToSax: 2,
+                offsetToPiano: 10,
+                desc: 'Transposición en Si♭ (+1 Tono arriba)',
                 icon: '🎷',
                 register: 'Agudo'
             },
@@ -123,8 +115,9 @@
                 id: 'alto',
                 name: 'Saxo Alto',
                 key: 'Eb',
-                offset: 9, // Major 6th up
-                desc: 'Transposición en Eb (+6ta Mayor / -3 semitonos)',
+                offsetToSax: 9,
+                offsetToPiano: 3,
+                desc: 'Transposición en Mi♭ (+6ta Mayor / -3 semitonos)',
                 icon: '🎷',
                 register: 'Medio'
             },
@@ -132,15 +125,16 @@
                 id: 'tenor',
                 name: 'Saxo Tenor',
                 key: 'Bb',
-                offset: 2, // Pitch class +2
-                desc: 'Transposición en Bb (+1 Tono arriba octava baja)',
+                offsetToSax: 2,
+                offsetToPiano: 10,
+                desc: 'Transposición en Si♭ (+1 Tono arriba octava baja)',
                 icon: '🎷',
                 register: 'Grave'
             }
         ];
 
-        // Scale degree names mapping dictionary
-        const DEGREE_NAMES = {
+
+        const DEGREE_NAMES_MAJOR = {
             '1': 'Tónica',
             '2': 'Supertónica',
             'b3': 'Mediante Menor',
@@ -154,81 +148,72 @@
             '7': 'Sensible'
         };
 
-        // Harmonic Structures and Interval definitions
-        const STRUCTURES = [
-            {
-                id: 'major_scale',
-                category: 'Escalas',
-                name: 'Escala Mayor (Natural)',
-                intervals: [0, 2, 4, 5, 7, 9, 11],
-                degrees: ['1', '2', '3', '4', '5', '6', '7']
-            },
-            {
-                id: 'triad_major',
-                category: 'Triadas',
-                name: 'Triada Mayor',
-                intervals: [0, 4, 7],
-                degrees: ['1', '3', '5']
-            },
-            {
-                id: 'triad_minor',
-                category: 'Triadas',
-                name: 'Triada Menor',
-                intervals: [0, 3, 7],
-                degrees: ['1', 'b3', '5']
-            },
-            {
-                id: 'pentatonic_major',
-                category: 'Pentatónicas',
-                name: 'Pentatónica Mayor',
-                intervals: [0, 2, 4, 7, 9],
-                degrees: ['1', '2', '3', '5', '6']
-            },
-            {
-                id: 'pentatonic_minor',
-                category: 'Pentatónicas',
-                name: 'Pentatónica Menor',
-                intervals: [0, 3, 5, 7, 10],
-                degrees: ['1', 'b3', '4', '5', 'b7']
-            },
-            {
-                id: 'blues_scale',
-                category: 'Blues',
-                name: 'Escala de Blues',
-                intervals: [0, 3, 5, 6, 7, 10],
-                degrees: ['1', 'b3', '4', 'b5', '5', 'b7']
-            },
-            {
-                id: 'harmonic_minor',
-                category: 'Menores',
-                name: 'Menor Armónica',
-                intervals: [0, 2, 3, 5, 7, 8, 11],
-                degrees: ['1', '2', 'b3', '4', '5', 'b6', '7']
-            },
-            {
-                id: 'melodic_minor',
-                category: 'Menores',
-                name: 'Menor Melódica',
-                intervals: [0, 2, 3, 5, 7, 9, 11],
-                degrees: ['1', '2', 'b3', '4', '5', '6', '7']
-            },
-            {
-                id: 'dom_7',
-                category: 'Acordes 7ma',
-                name: '7ma Dominante',
-                intervals: [0, 4, 7, 10],
-                degrees: ['1', '3', '5', 'b7']
-            },
-            {
-                id: 'maj_7',
-                category: 'Acordes 7ma',
-                name: '7ma Mayor (Maj7)',
-                intervals: [0, 4, 7, 11],
-                degrees: ['1', '3', '5', '7']
-            }
+        const DEGREE_NAMES_MINOR = {
+            '1': 'Tónica',
+            '2': 'Supertónica',
+            'b3': 'Mediante',
+            '3': 'Mediante Mayor',
+            '4': 'Subdominante',
+            'b5': 'Tritono / 5ta Disminuida',
+            '5': 'Dominante',
+            'b6': 'Superdominante',
+            '6': 'Superdominante Mayor',
+            'b7': 'Subtónica',
+            '7': 'Sensible (Séptima Mayor)'
+        };
+
+        const STRUCTURES_MAJOR = [
+            { id: 'major_scale', category: 'Escalas', name: 'Escala Mayor (Natural)', intervals: [0, 2, 4, 5, 7, 9, 11], degrees: ['1', '2', '3', '4', '5', '6', '7'] },
+            { id: 'triad_major', category: 'Triadas', name: 'Triada Mayor', intervals: [0, 4, 7], degrees: ['1', '3', '5'] },
+            { id: 'pentatonic_major', category: 'Pentatónicas', name: 'Pentatónica Mayor', intervals: [0, 2, 4, 7, 9], degrees: ['1', '2', '3', '5', '6'] },
+            { id: 'blues_scale', category: 'Blues', name: 'Escala de Blues', intervals: [0, 3, 5, 6, 7, 10], degrees: ['1', 'b3', '4', 'b5', '5', 'b7'] },
+            { id: 'maj_7', category: 'Acordes 7ma', name: '7ma Mayor (Maj7)', intervals: [0, 4, 7, 11], degrees: ['1', '3', '5', '7'] },
+            { id: 'dom_7', category: 'Acordes 7ma', name: '7ma Dominante (7)', intervals: [0, 4, 7, 10], degrees: ['1', '3', '5', 'b7'] }
         ];
 
-        // Standard Saxophone Fingerings database for pitch classes 0..11
+        const STRUCTURES_MINOR = [
+            { id: 'natural_minor', category: 'Escalas', name: 'Menor Natural', intervals: [0, 2, 3, 5, 7, 8, 10], degrees: ['1', '2', 'b3', '4', '5', 'b6', 'b7'] },
+            { id: 'harmonic_minor', category: 'Escalas', name: 'Menor Armónica', intervals: [0, 2, 3, 5, 7, 8, 11], degrees: ['1', '2', 'b3', '4', '5', 'b6', '7'] },
+            { id: 'melodic_minor', category: 'Escalas', name: 'Menor Melódica', intervals: [0, 2, 3, 5, 7, 9, 11], degrees: ['1', '2', 'b3', '4', '5', '6', '7'] },
+            { id: 'triad_minor', category: 'Triadas', name: 'Triada Menor', intervals: [0, 3, 7], degrees: ['1', 'b3', '5'] },
+            { id: 'pentatonic_minor', category: 'Pentatónicas', name: 'Pentatónica Menor', intervals: [0, 3, 5, 7, 10], degrees: ['1', 'b3', '4', 'b5', 'b7'] },
+            { id: 'minor_7', category: 'Acordes 7ma', name: '7ma Menor (m7)', intervals: [0, 3, 7, 10], degrees: ['1', 'b3', '5', 'b7'] }
+        ];
+
+
+        const PRACTICAL_CHART_MAJOR = [
+            { piano: 'C', soprano: 'D', alto: 'A', tenor: 'D' },
+            { piano: 'G', soprano: 'A', alto: 'E', tenor: 'A' },
+            { piano: 'D', soprano: 'E', alto: 'B', tenor: 'E' },
+            { piano: 'A', soprano: 'B', alto: 'F#', tenor: 'B' },
+            { piano: 'E', soprano: 'F#', alto: 'Db', tenor: 'F#' },
+            { piano: 'B', soprano: 'Db', alto: 'Ab', tenor: 'Db' },
+            { piano: 'F#', soprano: 'Ab', alto: 'Eb', tenor: 'Ab' },
+            { piano: 'Gb', soprano: 'Ab', alto: 'Eb', tenor: 'Ab' },
+            { piano: 'F', soprano: 'G', alto: 'D', tenor: 'G' },
+            { piano: 'Bb', soprano: 'C', alto: 'G', tenor: 'C' },
+            { piano: 'Eb', soprano: 'F', alto: 'C', tenor: 'F' },
+            { piano: 'Ab', soprano: 'Bb', alto: 'F', tenor: 'Bb' },
+            { piano: 'Db', soprano: 'Eb', alto: 'Bb', tenor: 'Eb' },
+            { piano: 'Cb', soprano: 'Db', alto: 'Ab', tenor: 'Db' }
+        ];
+
+        const PRACTICAL_CHART_MINOR = [
+            { piano: 'A', soprano: 'B', alto: 'F#', tenor: 'B' },
+            { piano: 'E', soprano: 'F#', alto: 'C#', tenor: 'F#' },
+            { piano: 'B', soprano: 'C#', alto: 'G#', tenor: 'C#' },
+            { piano: 'F#', soprano: 'G#', alto: 'D#', tenor: 'G#' },
+            { piano: 'C#', soprano: 'D#', alto: 'A#', tenor: 'D#' },
+            { piano: 'D', soprano: 'E', alto: 'B', tenor: 'E' },
+            { piano: 'G', soprano: 'A', alto: 'E', tenor: 'A' },
+            { piano: 'C', soprano: 'D', alto: 'A', tenor: 'D' },
+            { piano: 'F', soprano: 'G', alto: 'D', tenor: 'G' },
+            { piano: 'Bb', soprano: 'C', alto: 'G', tenor: 'C' },
+            { piano: 'Eb', soprano: 'F', alto: 'C', tenor: 'F' },
+            { piano: 'Ab', soprano: 'Bb', alto: 'F', tenor: 'Bb' }
+        ];
+
+
         const SAX_FINGERINGS = {
             0: { name: 'C', keys: { lh2: true, c: true } },
             1: { name: 'C# / Db', keys: { open: true } },
@@ -244,9 +229,84 @@
             11: { name: 'B', keys: { lh1: true } }
         };
 
+        const DIATONIC_STEPS = [0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6]; 
+        const ACCIDENTALS = ['', '♯', '', '♭', '', '', '♯', '', '♭', '', '♭', ''];
+
+
+        function getPitchName(pitchClass, contextKey = 'C') {
+            const preferFlatKeys = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
+            const useFlat = preferFlatKeys.includes(contextKey) || contextKey.includes('b');
+            const pitchObj = CHROMATIC_PITCHES.find(p => p.id === pitchClass);
+            if (!pitchObj) return 'C';
+            return useFlat ? pitchObj.altName : pitchObj.defaultName;
+        }
+
+        function getPracticalKeyName(pitchClass, rawName, isMinor = false) {
+            if (!isMinor) {
+                if (rawName === 'G#' || rawName === 'G#m') return 'Ab';
+                if (rawName === 'D#' || rawName === 'D#m') return 'Eb';
+                if (rawName === 'A#') return 'Bb';
+                if (rawName === 'E#') return 'F';
+                if (rawName === 'B#') return 'C';
+            }
+            return rawName;
+        }
+
+        function getPitchFrequency(pitchClass, octave = 4) {
+            const semitonesFromA4 = (octave - 4) * 12 + (pitchClass - 9);
+            return 440 * Math.pow(2, semitonesFromA4 / 12);
+        }
+
+        function generateStructureNotes(rootPitch, keyName, structure, isMinor = false) {
+            const degreeNamesMap = isMinor ? DEGREE_NAMES_MINOR : DEGREE_NAMES_MAJOR;
+            let currentOctave = 4;
+            let previousPitchClass = -1;
+
+            return structure.intervals.map((interval, idx) => {
+                const pitchClass = (rootPitch + interval) % 12;
+                
+                if (idx > 0 && pitchClass <= previousPitchClass) {
+                    currentOctave += Math.floor((rootPitch + interval) / 12) - Math.floor((rootPitch + structure.intervals[idx - 1]) / 12) || 1;
+                }
+                previousPitchClass = pitchClass;
+
+                const noteName = getPitchName(pitchClass, keyName);
+                const degree = structure.degrees[idx] || `${idx + 1}`;
+                const degreeName = degreeNamesMap[degree] || 'Nota';
+                const frequency = getPitchFrequency(pitchClass, currentOctave);
+
+                const totalSemitones = (currentOctave - 4) * 12 + pitchClass;
+                const diatonicStep = (currentOctave - 4) * 7 + DIATONIC_STEPS[pitchClass];
+                const usesOctaveKey = totalSemitones >= 14;
+
+                return {
+                    pitchClass,
+                    noteName,
+                    degree,
+                    degreeName,
+                    frequency,
+                    octave: currentOctave,
+                    diatonicStep,
+                    usesOctaveKey
+                };
+            });
+        }
+
+        function getRelativeKey(pitchClass, currentKeyName, isMinor) {
+            if (isMinor) {
+                const relPitch = (pitchClass + 3) % 12;
+                const relName = getPracticalKeyName(relPitch, getPitchName(relPitch, 'C'), false);
+                return { pitchClass: relPitch, keyName: relName, mode: 'major', title: `${relName} Mayor` };
+            } else {
+                const relPitch = (pitchClass + 9) % 12;
+                const relName = getPracticalKeyName(relPitch, getPitchName(relPitch, 'C'), true);
+                return { pitchClass: relPitch, keyName: relName, mode: 'minor', title: `${relName} Menor` };
+            }
+        }
+
         let audioCtx = null;
 
-        function playInstrumentPitch(frequency, duration = 0.6, soundMode = 'piano', saxType = 'alto') {
+        function playInstrumentPitch(freq, duration = 0.6, engine = 'piano', saxType = 'alto') {
             try {
                 if (!audioCtx) {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -257,300 +317,646 @@
 
                 const now = audioCtx.currentTime;
 
-                if (soundMode === 'piano') {
-                    // Grand Piano Synthesis
-                    const osc1 = audioCtx.createOscillator();
-                    const osc2 = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
-
-                    osc1.type = 'triangle';
-                    osc2.type = 'sine';
-
-                    osc1.frequency.setValueAtTime(frequency, now);
-                    osc2.frequency.setValueAtTime(frequency * 2, now);
-
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1800, now);
-                    filter.frequency.exponentialRampToValueAtTime(300, now + duration);
-
-                    gainNode.gain.setValueAtTime(0.001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.5, now + 0.02);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-                    osc1.connect(filter);
-                    osc2.connect(filter);
-                    filter.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + duration);
-                    osc2.stop(now + duration);
-
-                } else if (soundMode === 'sax') {
-                    // Realistic Saxophone Timbre
-                    const osc = audioCtx.createOscillator();
+                if (engine === 'sax') {
+                    /* REALISTIC ACOUSTIC SAXOPHONE SYNTHESIS ENGINE */
+                    const oscPrimary = audioCtx.createOscillator();
+                    const oscSecondary = audioCtx.createOscillator();
                     const subOsc = audioCtx.createOscillator();
+                    
+                    const mainGain = audioCtx.createGain();
+                    const filter1 = audioCtx.createBiquadFilter();
+                    const filter2 = audioCtx.createBiquadFilter();
+                    const formantFilter = audioCtx.createBiquadFilter();
+
+                    // Saxophone registers & acoustic body resonances
+                    if (saxType === 'soprano') {
+                        oscPrimary.type = 'sawtooth';
+                        oscSecondary.type = 'triangle';
+                        subOsc.type = 'sine';
+
+                        filter1.type = 'bandpass';
+                        filter1.frequency.setValueAtTime(freq * 1.8, now);
+                        filter1.Q.setValueAtTime(2.2, now);
+
+                        formantFilter.type = 'peaking';
+                        formantFilter.frequency.setValueAtTime(1800, now);
+                        formantFilter.gain.setValueAtTime(6, now);
+                    } else if (saxType === 'tenor') {
+                        oscPrimary.type = 'sawtooth';
+                        oscSecondary.type = 'sawtooth';
+                        subOsc.type = 'triangle';
+
+                        filter1.type = 'lowpass';
+                        filter1.frequency.setValueAtTime(freq * 2.8, now);
+
+                        formantFilter.type = 'peaking';
+                        formantFilter.frequency.setValueAtTime(650, now);
+                        formantFilter.gain.setValueAtTime(7, now);
+                    } else {
+                        // Alto Saxophone (default)
+                        oscPrimary.type = 'sawtooth';
+                        oscSecondary.type = 'triangle';
+                        subOsc.type = 'sine';
+
+                        filter1.type = 'lowpass';
+                        filter1.frequency.setValueAtTime(freq * 3.5, now);
+
+                        formantFilter.type = 'peaking';
+                        formantFilter.frequency.setValueAtTime(1100, now);
+                        formantFilter.gain.setValueAtTime(5, now);
+                    }
+
+                    // Natural Vibrato LFO (5.2 Hz)
                     const vibrato = audioCtx.createOscillator();
                     const vibratoGain = audioCtx.createGain();
-                    const gainNode = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
-
-                    let filterCutoff = 1400;
-                    if (saxType === 'soprano') filterCutoff = 2200;
-                    if (saxType === 'tenor') filterCutoff = 950;
-
-                    osc.type = 'sawtooth';
-                    subOsc.type = 'square';
-
-                    osc.frequency.setValueAtTime(frequency, now);
-                    subOsc.frequency.setValueAtTime(frequency * 0.5, now);
-
                     vibrato.frequency.setValueAtTime(5.2, now);
-                    vibratoGain.gain.setValueAtTime(frequency * 0.015, now);
-                    vibrato.connect(osc.frequency);
-
-                    filter.type = 'bandpass';
-                    filter.frequency.setValueAtTime(filterCutoff, now);
-                    filter.Q.setValueAtTime(1.8, now);
-
-                    gainNode.gain.setValueAtTime(0.001, now);
-                    gainNode.gain.linearRampToValueAtTime(0.35, now + 0.08);
-                    gainNode.gain.setValueAtTime(0.35, now + duration - 0.1);
-                    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-                    osc.connect(filter);
-                    subOsc.connect(filter);
-                    filter.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-
+                    vibratoGain.gain.setValueAtTime(0, now);
+                    vibratoGain.gain.linearRampToValueAtTime(freq * 0.015, now + 0.2); // Delayed natural vibrato
+                    vibrato.connect(oscPrimary.frequency);
+                    vibrato.connect(oscSecondary.frequency);
                     vibrato.start(now);
-                    osc.start(now);
-                    subOsc.start(now);
 
-                    vibrato.stop(now + duration);
-                    osc.stop(now + duration);
+                    // Reed Attack Chiff / Breath noise transient
+                    const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.06, audioCtx.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    for (let i = 0; i < noiseBuffer.length; i++) {
+                        output[i] = Math.random() * 2 - 1;
+                    }
+                    const noiseSource = audioCtx.createBufferSource();
+                    noiseSource.buffer = noiseBuffer;
+                    const noiseFilter = audioCtx.createBiquadFilter();
+                    noiseFilter.type = 'bandpass';
+                    noiseFilter.frequency.setValueAtTime(2400, now);
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.08, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+                    noiseSource.connect(noiseFilter);
+                    noiseFilter.connect(noiseGain);
+                    noiseGain.connect(mainGain);
+
+                    // Frequency detuning for natural warmth
+                    oscPrimary.frequency.setValueAtTime(freq, now);
+                    oscSecondary.frequency.setValueAtTime(freq * 1.002, now);
+                    subOsc.frequency.setValueAtTime(freq * 0.5, now);
+
+                    // Audio Routing
+                    oscPrimary.connect(filter1);
+                    oscSecondary.connect(filter1);
+                    subOsc.connect(filter2);
+                    filter1.connect(formantFilter);
+                    filter2.connect(formantFilter);
+                    formantFilter.connect(mainGain);
+
+                    // ADSR Envelope
+                    mainGain.gain.setValueAtTime(0, now);
+                    mainGain.gain.linearRampToValueAtTime(0.35, now + 0.04); // Smooth breath attack
+                    mainGain.gain.setValueAtTime(0.35, now + duration - 0.15);
+                    mainGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                    mainGain.connect(audioCtx.destination);
+
+                    oscPrimary.start(now);
+                    oscSecondary.start(now);
+                    subOsc.start(now);
+                    noiseSource.start(now);
+
+                    oscPrimary.stop(now + duration);
+                    oscSecondary.stop(now + duration);
                     subOsc.stop(now + duration);
+                    vibrato.stop(now + duration);
+
+                } else {
+                    /* GERMAN CLASSICAL GRAND PIANO SYNTHESIS ENGINE */
+                    const masterGain = audioCtx.createGain();
+                    
+                    // Fundamental & Harmonics array simulating German Classical Piano strings
+                    const partials = [
+                        { mult: 1.0,  gain: 0.55, decay: 1.0 },
+                        { mult: 2.0,  gain: 0.25, decay: 0.8 },
+                        { mult: 3.0,  gain: 0.15, decay: 0.6 },
+                        { mult: 4.01, gain: 0.08, decay: 0.4 },
+                        { mult: 5.98, gain: 0.04, decay: 0.3 }
+                    ];
+
+                    partials.forEach((p) => {
+                        const pOsc = audioCtx.createOscillator();
+                        const pGain = audioCtx.createGain();
+
+                        pOsc.type = p.mult === 1.0 ? 'triangle' : 'sine';
+                        pOsc.frequency.setValueAtTime(freq * p.mult, now);
+
+                        // String decay rate
+                        const pDecay = duration * p.decay;
+                        pGain.gain.setValueAtTime(0, now);
+                        pGain.gain.linearRampToValueAtTime(p.gain, now + 0.008); // Sharp hammer strike
+                        pGain.gain.exponentialRampToValueAtTime(0.0001, now + pDecay);
+
+                        pOsc.connect(pGain);
+                        pGain.connect(masterGain);
+
+                        pOsc.start(now);
+                        pOsc.stop(now + pDecay);
+                    });
+
+                    // Acoustic Piano Soundboard Filter
+                    const soundboardFilter = audioCtx.createBiquadFilter();
+                    soundboardFilter.type = 'lowpass';
+                    soundboardFilter.frequency.setValueAtTime(Math.min(freq * 4.5, 8000), now);
+                    soundboardFilter.Q.setValueAtTime(1.0, now);
+
+                    masterGain.connect(soundboardFilter);
+                    soundboardFilter.connect(audioCtx.destination);
                 }
-            } catch (e) {
-                console.error('Audio Synthesis Error:', e);
+            } catch (err) {
+                console.warn('Audio play error:', err);
             }
         }
 
-        function getPitchFrequency(pitchClass, octave = 4) {
-            const midiNote = (octave + 1) * 12 + pitchClass;
-            return 440 * Math.pow(2, (midiNote - 69) / 12);
-        }
 
-        function getTransposedPitch(concertPitch, offsetSemis) {
-            return (concertPitch + offsetSemis) % 12;
-        }
-
-        const PREFERRED_SPELLINGS = {
-            'C':  ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
-            'G':  ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
-            'D':  ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
-            'A':  ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
-            'E':  ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'],
-            'B':  ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
-            'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'],
-            'F':  ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
-            'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
-            'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
-            'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
-            'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
-            'Gb': ['Gb', 'Ab', 'Bb', 'Cb', 'Db', 'Eb', 'F'],
-            'C#': ['C#', 'D#', 'E#', 'F#', 'G#', 'A#', 'B#']
-        };
-
-        function getPitchName(pitchClass, keyContext = 'C') {
-            const preferFlats = ['F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'].includes(keyContext);
-            const pitch = CHROMATIC_PITCHES.find(p => p.id === pitchClass);
-            if (!pitch) return '?';
-            return preferFlats ? (pitch.altName.includes('b') ? pitch.altName : pitch.defaultName) : pitch.defaultName;
-        }
-
-        function generateStructureNotes(rootPitchClass, rootKeyName, structure) {
-            return structure.intervals.map((interval, idx) => {
-                const pitchClass = (rootPitchClass + interval) % 12;
-                let noteName = getPitchName(pitchClass, rootKeyName);
-
-                if (PREFERRED_SPELLINGS[rootKeyName] && structure.intervals.length === 7) {
-                    noteName = PREFERRED_SPELLINGS[rootKeyName][idx] || noteName;
-                }
-
-                const degreeCode = structure.degrees[idx] || '';
-                const degreeName = DEGREE_NAMES[degreeCode] || `Grado ${idx + 1}`;
-
-                return {
-                    pitchClass,
-                    noteName,
-                    degree: degreeCode,
-                    degreeName,
-                    interval,
-                    frequency: getPitchFrequency(pitchClass, interval < 0 ? 3 : 4)
-                };
-            });
-        }
-
-        function SaxophoneKeysDiagram({ pitchClass, noteName, isDarkMode }) {
+        function SaxophoneGraphicDiagram({ pitchClass, noteName, usesOctaveKey, isDarkMode }) {
             const fingering = SAX_FINGERINGS[pitchClass] || { keys: {} };
-            const k = fingering.keys;
+            const k = { ...fingering.keys, octave: usesOctaveKey || fingering.keys.octave };
 
-            const getKeyClass = (isActive) => isActive ? 'sax-key-active' : 'sax-key-inactive';
+            const getKeyClass = (active) => active ? 'key-active-green' : (isDarkMode ? 'fill-slate-900 stroke-slate-400' : 'fill-slate-100 stroke-slate-500');
 
             return (
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} flex flex-col items-center justify-center`}>
+                <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} flex flex-col items-center justify-center shadow-lg`}>
                     <div className="flex items-center justify-between w-full mb-3">
-                        <span className="text-xs uppercase font-extrabold tracking-wider text-amber-500 flex items-center gap-1.5">
-                            <span>🎷 Digitación Saxofón:</span>
-                            <span className="text-base text-emerald-400 font-black">{noteName}</span>
+                        <span className="text-xs uppercase font-extrabold tracking-wider text-amber-500 flex items-center gap-2">
+                            🎷 Digitación Tradicional (Saxofón): <span className="text-base text-slate-100 font-black">{noteName}</span>
                         </span>
-                        {k.open && (
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                                Llaves Abiertas
+                        {k.octave && (
+                            <span className="text-[10px] bg-amber-500/20 text-amber-400 font-bold px-2.5 py-1 rounded-full border border-amber-500/40 animate-pulse flex items-center gap-1">
+                                ▲ Octavador Activado
                             </span>
                         )}
                     </div>
 
-                    {/* Detailed Vector Graphic Saxophone Simulation */}
-                    <div className="relative w-full max-w-[260px] bg-slate-950/90 rounded-2xl border border-amber-500/30 p-2 flex flex-col items-center shadow-2xl">
-                        <svg viewBox="0 0 240 480" className="w-full h-auto max-h-[420px]">
-                            <defs>
-                                <linearGradient id="saxBrass" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#f59e0b" />
-                                    <stop offset="50%" stopColor="#d97706" />
-                                    <stop offset="100%" stopColor="#78350f" />
-                                </linearGradient>
-                                <linearGradient id="saxBell" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#fbbf24" />
-                                    <stop offset="70%" stopColor="#b45309" />
-                                    <stop offset="100%" stopColor="#451a03" />
-                                </linearGradient>
-                            </defs>
-
-                            {/* Saxophone Body Outline */}
-                            <path d="M 115 15 L 115 35 Q 115 55 105 65 L 95 75" fill="none" stroke="url(#saxBrass)" strokeWidth="12" strokeLinecap="round" />
-                            <rect x="110" y="8" width="10" height="12" rx="2" fill="#78350f" stroke="#fbbf24" strokeWidth="1" />
-
-                            <path d="M 95 75 L 95 360" fill="none" stroke="url(#saxBrass)" strokeWidth="26" strokeLinecap="round" />
+                    <div className="relative w-full max-w-[220px] h-[360px] bg-slate-950/90 rounded-2xl border border-amber-500/30 p-2 flex items-center justify-center shadow-2xl overflow-hidden">
+                        <svg viewBox="0 0 200 360" className="w-full h-full drop-shadow-md">
                             
-                            <path d="M 95 355 C 95 440 170 440 175 350 L 180 270" fill="none" stroke="url(#saxBrass)" strokeWidth="28" strokeLinecap="round" />
-                            <ellipse cx="185" cy="260" rx="28" ry="18" fill="url(#saxBell)" stroke="#fbbf24" strokeWidth="3" />
-
-                            <path d="M 112 120 L 112 370" stroke="#92400e" strokeWidth="3" fill="none" />
-
-                            {/* OCTAVE KEY */}
-                            <g>
-                                <circle cx="120" cy="45" r="7" className={getKeyClass(k.ok)} />
-                                <text x="132" y="48" fill="#94a3b8" fontSize="9" fontWeight="bold">OCT</text>
+                            {/* TRIANGLE OCTAVE KEY (Octavador) */}
+                            <g id="octave-key-group">
+                                <polygon points="36,25 20,38 36,51" className={getKeyClass(k.octave)} strokeWidth="2.5" />
+                                <text x="28" y="20" fill="#f59e0b" fontSize="8" fontWeight="bold" textAnchor="middle">OCT</text>
                             </g>
 
-                            {/* LEFT HAND STACK */}
-                            <g>
-                                <circle cx="95" cy="120" r="11" className={getKeyClass(k.lh1)} />
-                                <text x="95" y="124" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">1</text>
-                                <text x="62" y="124" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Izq 1</text>
+                            {/* Front F / High Palm Key Left */}
+                            <polygon points="65,58 78,42 78,70" className={getKeyClass(k.frontF)} strokeWidth="2" />
+
+                            {/* Main Stack Circle 1 (LH1) */}
+                            <circle cx="100" cy="60" r="16" className={getKeyClass(k.lh1)} strokeWidth="3" />
+
+                            {/* Bis Key */}
+                            <circle cx="122" cy="74" r="7" className={getKeyClass(k.bis)} strokeWidth="2.5" />
+
+                            {/* Palm Keys */}
+                            <g id="palm-keys">
+                                <ellipse cx="140" cy="30" rx="6" ry="12" className={getKeyClass(k.palmD)} strokeWidth="2" />
+                                <ellipse cx="152" cy="45" rx="6" ry="12" className={getKeyClass(k.palmEb)} strokeWidth="2" />
+                                <ellipse cx="154" cy="68" rx="6" ry="12" className={getKeyClass(k.palmF)} strokeWidth="2" />
                             </g>
 
-                            <g>
-                                <circle cx="108" cy="140" r="6" className={getKeyClass(k.bis)} />
-                                <text x="118" y="143" fill="#fbbf24" fontSize="8" fontWeight="bold">Bis (Bb)</text>
+                            {/* Main Stack Circle 2 (LH2) */}
+                            <circle cx="100" cy="102" r="16" className={getKeyClass(k.lh2)} strokeWidth="3" />
+
+                            {/* Main Stack Circle 3 (LH3) */}
+                            <circle cx="100" cy="144" r="16" className={getKeyClass(k.lh3)} strokeWidth="3" />
+
+                            {/* G# / Table Keys */}
+                            <g id="lh-table-keys">
+                                <path d="M 125 140 A 18 18 0 0 1 155 140 L 155 152 L 125 152 Z" className={getKeyClass(k.gis)} strokeWidth="2" />
+                                <rect x="125" y="154" width="14" height="12" rx="2" className={getKeyClass(k.cis)} strokeWidth="2" />
+                                <rect x="141" y="154" width="14" height="12" rx="2" className={getKeyClass(k.b)} strokeWidth="2" />
+                                <path d="M 125 168 L 155 168 A 15 15 0 0 1 125 180 Z" className={getKeyClass(k.lowBb)} strokeWidth="2" />
                             </g>
 
-                            <g>
-                                <circle cx="95" cy="158" r="11" className={getKeyClass(k.lh2)} />
-                                <text x="95" y="162" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">2</text>
-                                <text x="62" y="162" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Izq 2</text>
+                            {/* Middle Diagonal Divider Line */}
+                            <line x1="30" y1="130" x2="170" y2="220" stroke="#64748b" strokeWidth="2" strokeDasharray="4 2" />
+
+                            {/* Side Keys */}
+                            <g id="side-keys-left">
+                                <rect x="62" y="195" width="8" height="18" rx="3" className={getKeyClass(k.sideC)} strokeWidth="2" />
+                                <rect x="62" y="220" width="8" height="18" rx="3" className={getKeyClass(k.sideB)} strokeWidth="2" />
+                                <rect x="62" y="245" width="8" height="18" rx="3" className={getKeyClass(k.sideE)} strokeWidth="2" />
                             </g>
 
-                            <g>
-                                <circle cx="95" cy="195" r="11" className={getKeyClass(k.lh3)} />
-                                <text x="95" y="199" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">3</text>
-                                <text x="62" y="199" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Izq 3</text>
+                            {/* Main Stack Circle 4 (RH1) */}
+                            <circle cx="100" cy="195" r="16" className={getKeyClass(k.rh1)} strokeWidth="3" />
+
+                            {/* Side Keys (Right of RH1) */}
+                            <g id="side-keys-right">
+                                <rect x="124" y="235" width="8" height="16" rx="3" className={getKeyClass(k.ta)} strokeWidth="2" />
                             </g>
 
-                            <g>
-                                <rect x="112" y="212" width="22" height="12" rx="4" className={getKeyClass(k.gis)} />
-                                <text x="115" y="221" fill="#ffffff" fontSize="8" fontWeight="bold">G#</text>
+                            {/* Main Stack Circle 5 (RH2) */}
+                            <circle cx="100" cy="238" r="16" className={getKeyClass(k.rh2)} strokeWidth="3" />
+
+                            {/* Main Stack Circle 6 (RH3) */}
+                            <circle cx="100" cy="280" r="16" className={getKeyClass(k.rh3)} strokeWidth="3" />
+
+                            {/* Bottom Eb & C Keys */}
+                            <g id="bottom-keys">
+                                <path d="M 85 305 Q 100 295 115 305 Q 115 320 85 320 Z" className={getKeyClass(k.eb)} strokeWidth="2" />
+                                <path d="M 85 324 Q 100 324 115 324 Q 115 342 85 342 Z" className={getKeyClass(k.c)} strokeWidth="2" />
                             </g>
 
-                            <line x1="75" y1="235" x2="115" y2="235" stroke="#475569" strokeWidth="2" strokeDasharray="3 3" />
-
-                            {/* RIGHT HAND STACK */}
-                            <g>
-                                <circle cx="95" cy="265" r="11" className={getKeyClass(k.rh1)} />
-                                <text x="95" y="269" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">1</text>
-                                <text x="62" y="269" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Der 1</text>
-                            </g>
-
-                            <g>
-                                <circle cx="95" cy="302" r="11" className={getKeyClass(k.rh2)} />
-                                <text x="95" y="306" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">2</text>
-                                <text x="62" y="306" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Der 2</text>
-                            </g>
-
-                            <g>
-                                <circle cx="95" cy="340" r="11" className={getKeyClass(k.rh3)} />
-                                <text x="95" y="344" fill="#ffffff" fontSize="11" fontWeight="bold" textAnchor="middle">3</text>
-                                <text x="62" y="344" fill="#cbd5e1" fontSize="9" fontWeight="bold">M.Der 3</text>
-                            </g>
-
-                            <g>
-                                <rect x="112" y="355" width="20" height="12" rx="4" className={getKeyClass(k.eb)} />
-                                <text x="115" y="364" fill="#ffffff" fontSize="8" fontWeight="bold">Eb</text>
-                            </g>
-                            <g>
-                                <rect x="112" y="372" width="20" height="12" rx="4" className={getKeyClass(k.c)} />
-                                <text x="117" y="381" fill="#ffffff" fontSize="8" fontWeight="bold">C</text>
-                            </g>
                         </svg>
                     </div>
                 </div>
             );
         }
 
+
+        function MusicalStaffDiagram({ activeNotes, selectedNoteIndex, onSelectNote, soundEngine, selectedSax, isDarkMode }) {
+            return (
+                <div className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} shadow-sm`}>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                            <h2 className="font-bold text-base tracking-wide flex items-center gap-2">
+                                🎼 Pentagrama y Escala en Clave de Sol (Saxofón)
+                            </h2>
+                        </div>
+                        <span className="text-xs text-slate-400">Altura real según la tonalidad del saxofón</span>
+                    </div>
+
+                    <div className="relative w-full overflow-x-auto bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-center min-h-[170px]">
+                        <svg viewBox="0 0 650 160" className="w-full max-w-[700px] h-[150px]">
+                            {/* Staff Lines */}
+                            <line x1="40" y1="45" x2="610" y2="45" stroke="#475569" strokeWidth="1.5" />
+                            <line x1="40" y1="60" x2="610" y2="60" stroke="#475569" strokeWidth="1.5" />
+                            <line x1="40" y1="75" x2="610" y2="75" stroke="#475569" strokeWidth="1.5" />
+                            <line x1="40" y1="90" x2="610" y2="90" stroke="#475569" strokeWidth="1.5" />
+                            <line x1="40" y1="105" x2="610" y2="105" stroke="#475569" strokeWidth="1.5" />
+
+                            {/* Treble Clef Graphic */}
+                            <text x="45" y="100" fill="#f59e0b" fontSize="54" fontFamily="serif" fontWeight="bold">
+                                🎼
+                            </text>
+
+                            {/* Noteheads on Pentagram */}
+                            {activeNotes.map((note, idx) => {
+                                const isSelected = selectedNoteIndex === idx;
+                                const stepX = 120 + idx * ((570 - 120) / Math.max(activeNotes.length - 1, 1));
+                                
+                                const baseE4Y = 105;
+                                const lineSpacing = 7.5;
+                                const diatonicStepFromE4 = (note.diatonicStep !== undefined ? note.diatonicStep : idx) - 2;
+                                const noteY = baseE4Y - (diatonicStepFromE4 * lineSpacing);
+
+                                const accidental = ACCIDENTALS[note.pitchClass];
+
+                                const hasLedgerC4 = note.diatonicStep === 0;
+                                const hasLedgerA5 = note.diatonicStep >= 12;
+
+                                return (
+                                    <g key={idx} onClick={() => onSelectNote(idx, note.frequency)} className="cursor-pointer group">
+                                        {hasLedgerC4 && (
+                                            <line x1={stepX - 12} y1={120} x2={stepX + 12} y2={120} stroke="#94a3b8" strokeWidth="2" />
+                                        )}
+
+                                        {hasLedgerA5 && (
+                                            <line x1={stepX - 12} y1={30} x2={stepX + 12} y2={30} stroke="#94a3b8" strokeWidth="2" />
+                                        )}
+
+                                        <line 
+                                            x1={noteY > 75 ? stepX + 6 : stepX - 6} 
+                                            y1={noteY} 
+                                            x2={noteY > 75 ? stepX + 6 : stepX - 6} 
+                                            y2={noteY > 75 ? noteY - 26 : noteY + 26} 
+                                            stroke={isSelected ? '#f59e0b' : '#94a3b8'} 
+                                            strokeWidth="2" 
+                                        />
+
+                                        <ellipse
+                                            cx={stepX}
+                                            cy={noteY}
+                                            rx="7"
+                                            ry="5"
+                                            transform={`rotate(-20 ${stepX} ${noteY})`}
+                                            fill={isSelected ? '#f59e0b' : '#38bdf8'}
+                                            stroke={isSelected ? '#fef08a' : '#0284c7'}
+                                            strokeWidth="2"
+                                            className="transition-transform group-hover:scale-125"
+                                        />
+
+                                        {note.usesOctaveKey && (
+                                            <text x={stepX} y={noteY - 14} textAnchor="middle" fill="#f59e0b" fontSize="9" fontWeight="extrabold">
+                                                ▲
+                                            </text>
+                                        )}
+
+                                        {accidental && (
+                                            <text x={stepX - 16} y={noteY + 4} fill="#e2e8f0" fontSize="13" fontWeight="bold">
+                                                {accidental}
+                                            </text>
+                                        )}
+
+                                        <text x={stepX} y="145" textAnchor="middle" fill={isSelected ? '#f59e0b' : '#94a3b8'} fontSize="11" fontWeight="bold">
+                                            {note.noteName}
+                                        </text>
+                                    </g>
+                                );
+                            })}
+                        </svg>
+                    </div>
+                </div>
+            );
+        }
+
+
+        function GeminiAiAssistant({ currentKey, currentSax, isDarkMode }) {
+            const [isOpen, setIsOpen] = React.useState(false);
+            const [messages, setMessages] = React.useState([
+                { role: 'model', text: `¡Hola! Soy tu asistente de **Jag2Sax**. Puedo ayudarte con teoría musical, consejos de digitación, embocadura o progresiones armónicas para **${currentSax.name}** en tonalidad de **${currentKey}**. ¿En qué puedo ayudarte?` }
+            ]);
+            const [inputQuery, setInputQuery] = React.useState('');
+            const [isLoading, setIsLoading] = React.useState(false);
+
+            const chatEndRef = React.useRef(null);
+
+            React.useEffect(() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [messages]);
+
+            const handleSend = async () => {
+                if (!inputQuery.trim() || isLoading) return;
+
+                const userMsg = inputQuery;
+                setInputQuery('');
+                setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+                setIsLoading(true);
+
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                    const systemInstruction = `Eres un virtuoso del saxofón, pianista y profesor experto en teoría musical para la app "Jag2Sax Transpositor".
+                    El usuario está trabajando actualmente con el ${currentSax.name} en la tonalidad de ${currentKey}.
+                    Responde siempre de manera concisa, clara, didáctica y en español entusiasta con formato Markdown sencillo.`;
+
+                    const payload = {
+                        contents: messages.concat({ role: 'user', text: userMsg }).map(m => ({
+                            role: m.role === 'model' ? 'model' : 'user',
+                            parts: [{ text: m.text }]
+                        })),
+                        systemInstruction: {
+                            parts: [{ text: systemInstruction }]
+                        }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    const replyText = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude obtener una respuesta en este momento. Inténtalo de nuevo.';
+
+                    setMessages(prev => [...prev, { role: 'model', text: replyText }]);
+                } catch (error) {
+                    console.error('Gemini API Error:', error);
+                    setMessages(prev => [...prev, { role: 'model', text: ' Hubo un problema al conectar con la IA de Jag2Sax. Por favor intenta de nuevo.' }]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            return (
+                <div className={`rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-indigo-500/30' : 'bg-white border-indigo-200'} p-4 shadow-xl`}>
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-full flex items-center justify-between text-left"
+                    >
+                        <div className="flex items-center space-x-3">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-lg font-bold shadow-md">
+                                🤖
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-sm tracking-wide text-indigo-400">
+                                    Consultas con IA Musical (Gemini)
+                                </h3>
+                                <p className="text-xs text-slate-400">Pregunta sobre teoría, embocadura, solos e improvisación</p>
+                            </div>
+                        </div>
+                        <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                            {isOpen ? 'Ocultar Chat ✕' : 'Abrir Asistente ✨'}
+                        </span>
+                    </button>
+
+                    {isOpen && (
+                        <div className="mt-4 pt-4 border-t border-slate-800 flex flex-col h-72">
+                            <div className="flex-1 overflow-y-auto space-y-3 pr-2 text-xs">
+                                {messages.map((m, i) => (
+                                    <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[85%] p-3 rounded-2xl leading-relaxed ${
+                                            m.role === 'user'
+                                            ? 'bg-blue-600 text-white rounded-tr-none'
+                                            : isDarkMode ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-tl-none' : 'bg-slate-100 text-slate-800 rounded-tl-none'
+                                        }`}>
+                                            {m.text}
+                                        </div>
+                                    </div>
+                                ))}
+                                {isLoading && (
+                                    <div className="flex justify-start">
+                                        <div className="p-3 rounded-2xl bg-slate-800 text-amber-400 text-xs animate-pulse">
+                                            🤔 Analizando tu consulta musical con Gemini IA...
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={chatEndRef} />
+                            </div>
+
+                            <div className="mt-3 flex items-center space-x-2">
+                                <input
+                                    type="text"
+                                    value={inputQuery}
+                                    onChange={(e) => setInputQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                                    placeholder="Ej: ¿Qué notas puedo usar para improvisar sobre esta tonalidad?"
+                                    className={`flex-1 px-3 py-2 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                        isDarkMode ? 'bg-slate-950 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
+                                    }`}
+                                />
+                                <button
+                                    onClick={handleSend}
+                                    disabled={isLoading}
+                                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-md shadow-indigo-600/30 disabled:opacity-50"
+                                >
+                                    Enviar
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+
+        function PracticalTableModal({ isOpen, onClose, isDarkMode }) {
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+                    <div className={`w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border shadow-2xl p-6 ${
+                        isDarkMode ? 'bg-slate-900 border-amber-500/30 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                    }`}>
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+                            <div>
+                                <h3 className="text-lg font-black text-amber-500 flex items-center gap-2">
+                                    📋 Tabla Práctica de Transposición (Piano ➔ Saxofones)
+                                </h3>
+                                <p className="text-xs text-slate-400">Sin tonalidades teóricas complejas (evitando Sol#, Re#, La# mayor)</p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+                            >
+                                Cerrar ✕
+                            </button>
+                        </div>
+
+                        {/* Major Keys Table */}
+                        <div className="mb-6">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-1">
+                                🎹 Tonalidades MAYORES
+                            </h4>
+                            <div className="overflow-x-auto rounded-xl border border-slate-800">
+                                <table className="w-full text-xs text-left">
+                                    <thead className="bg-slate-950 text-amber-400 uppercase font-extrabold border-b border-slate-800">
+                                        <tr>
+                                            <th className="p-3">🎹 Piano / Concierto</th>
+                                            <th className="p-3">🎷 Soprano (Bb)</th>
+                                            <th className="p-3">🎷 Alto (Eb)</th>
+                                            <th className="p-3">🎷 Tenor (Bb)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800">
+                                        {PRACTICAL_CHART_MAJOR.map((row, i) => (
+                                            <tr key={i} className="hover:bg-slate-800/40 font-semibold">
+                                                <td className="p-2.5 text-blue-400 font-extrabold">{row.piano} Mayor</td>
+                                                <td className="p-2.5">{row.soprano} Mayor</td>
+                                                <td className="p-2.5 text-amber-400 font-extrabold">{row.alto} Mayor</td>
+                                                <td className="p-2.5">{row.tenor} Mayor</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {/* Minor Keys Table */}
+                        <div>
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2 flex items-center gap-1">
+                                🎵 Tonalidades MENORES
+                            </h4>
+                            <div className="overflow-x-auto rounded-xl border border-slate-800">
+                                <table className="w-full text-xs text-left">
+                                    <thead className="bg-slate-950 text-indigo-400 uppercase font-extrabold border-b border-slate-800">
+                                        <tr>
+                                            <th className="p-3">🎹 Piano / Concierto</th>
+                                            <th className="p-3">🎷 Soprano (Bb)</th>
+                                            <th className="p-3">🎷 Alto (Eb)</th>
+                                            <th className="p-3">🎷 Tenor (Bb)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800">
+                                        {PRACTICAL_CHART_MINOR.map((row, i) => (
+                                            <tr key={i} className="hover:bg-slate-800/40 font-semibold">
+                                                <td className="p-2.5 text-indigo-400 font-extrabold">{row.piano}m</td>
+                                                <td className="p-2.5">{row.soprano}m</td>
+                                                <td className="p-2.5 text-amber-400 font-extrabold">{row.alto}m</td>
+                                                <td className="p-2.5">{row.tenor}m</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+
         function App() {
-            const [selectedPianoKey, setSelectedPianoKey] = React.useState(PIANO_KEYS[0]);
+            const [selectedInputKey, setSelectedInputKey] = React.useState(INPUT_KEYS[0]);
             const [selectedSax, setSelectedSax] = React.useState(SAXOPHONES[1]);
-            const [selectedStructure, setSelectedStructure] = React.useState(STRUCTURES[0]);
+            const [keyMode, setKeyMode] = React.useState('major');
+            const [direction, setDirection] = React.useState('pianoToSax');
             const [soundEngine, setSoundEngine] = React.useState('piano');
             const [selectedNoteIndex, setSelectedNoteIndex] = React.useState(0);
             const [isDarkMode, setIsDarkMode] = React.useState(true);
             const [isPlayingScale, setIsPlayingScale] = React.useState(false);
-            const [showTutorial, setShowTutorial] = React.useState(false);
+            const [showTableModal, setShowTableModal] = React.useState(false);
+            const [isRelativeSelected, setIsRelativeSelected] = React.useState(false);
 
-            const transposedPitch = React.useMemo(() => {
-                return getTransposedPitch(selectedPianoKey.pitch, selectedSax.offset);
-            }, [selectedPianoKey, selectedSax]);
+            const activeStructures = React.useMemo(() => {
+                return keyMode === 'minor' ? STRUCTURES_MINOR : STRUCTURES_MAJOR;
+            }, [keyMode]);
 
-            const transposedKeyName = React.useMemo(() => {
-                if (selectedSax.key === 'Eb') {
-                    const mapEb = {
-                        'C': 'A', 'C#': 'A#', 'Db': 'Bb', 'D': 'B', 'Eb': 'C',
-                        'E': 'C#', 'F': 'D', 'F#': 'D#', 'Gb': 'Eb', 'G': 'E',
-                        'Ab': 'F', 'A': 'F#', 'Bb': 'G', 'B': 'G#'
-                    };
-                    return mapEb[selectedPianoKey.key] || getPitchName(transposedPitch, 'C');
-                } else if (selectedSax.key === 'Bb') {
-                    const mapBb = {
-                        'C': 'D', 'C#': 'D#', 'Db': 'Eb', 'D': 'E', 'Eb': 'F',
-                        'E': 'F#', 'F': 'G', 'F#': 'G#', 'Gb': 'Ab', 'G': 'A',
-                        'Ab': 'Bb', 'A': 'B', 'Bb': 'C', 'B': 'C#'
-                    };
-                    return mapBb[selectedPianoKey.key] || getPitchName(transposedPitch, 'C');
+            const [selectedStructure, setSelectedStructure] = React.useState(STRUCTURES_MAJOR[0]);
+
+            React.useEffect(() => {
+                setSelectedStructure(keyMode === 'minor' ? STRUCTURES_MINOR[0] : STRUCTURES_MAJOR[0]);
+                setSelectedNoteIndex(0);
+                setIsRelativeSelected(false);
+            }, [keyMode]);
+
+            const computedTransposedPitchAndName = React.useMemo(() => {
+                const isPianoToSax = direction === 'pianoToSax';
+                const chart = keyMode === 'minor' ? PRACTICAL_CHART_MINOR : PRACTICAL_CHART_MAJOR;
+
+                if (isPianoToSax) {
+                    const match = chart.find(row => row.piano === selectedInputKey.key);
+                    if (match) {
+                        const saxKeyName = match[selectedSax.id] || match.soprano;
+                        const pitchObj = INPUT_KEYS.find(k => k.key === saxKeyName) || CHROMATIC_PITCHES.find(p => p.defaultName === saxKeyName || p.altName === saxKeyName);
+                        const pitchClass = pitchObj ? (pitchObj.pitch !== undefined ? pitchObj.pitch : pitchObj.id) : 0;
+                        return { pitchClass, keyName: saxKeyName };
+                    }
+                } else {
+                    const match = chart.find(row => row[selectedSax.id] === selectedInputKey.key);
+                    if (match) {
+                        const pianoKeyName = match.piano;
+                        const pitchObj = INPUT_KEYS.find(k => k.key === pianoKeyName);
+                        const pitchClass = pitchObj ? pitchObj.pitch : 0;
+                        return { pitchClass, keyName: pianoKeyName };
+                    }
                 }
-                return getPitchName(transposedPitch, selectedPianoKey.key);
-            }, [selectedPianoKey, selectedSax, transposedPitch]);
+
+                const offset = isPianoToSax ? selectedSax.offsetToSax : selectedSax.offsetToPiano;
+                const resultPitch = (selectedInputKey.pitch + offset) % 12;
+                const rawKeyName = getPitchName(resultPitch, selectedInputKey.key);
+                const practicalName = getPracticalKeyName(resultPitch, rawKeyName, keyMode === 'minor');
+
+                return {
+                    pitchClass: resultPitch,
+                    keyName: practicalName
+                };
+            }, [selectedInputKey, selectedSax, direction, keyMode]);
+
+            const effectiveTransposedData = React.useMemo(() => {
+                if (isRelativeSelected) {
+                    const rel = getRelativeKey(computedTransposedPitchAndName.pitchClass, computedTransposedPitchAndName.keyName, keyMode === 'minor');
+                    return { pitchClass: rel.pitchClass, keyName: rel.keyName, isMinor: rel.mode === 'minor', title: rel.title };
+                }
+                return { pitchClass: computedTransposedPitchAndName.pitchClass, keyName: computedTransposedPitchAndName.keyName, isMinor: keyMode === 'minor', title: '' };
+            }, [computedTransposedPitchAndName, isRelativeSelected, keyMode]);
+
+            const transposedKeyName = effectiveTransposedData.keyName;
+            const transposedPitch = effectiveTransposedData.pitchClass;
 
             const activeNotes = React.useMemo(() => {
-                return generateStructureNotes(transposedPitch, transposedKeyName, selectedStructure);
-            }, [transposedPitch, transposedKeyName, selectedStructure]);
+                return generateStructureNotes(transposedPitch, transposedKeyName, selectedStructure, effectiveTransposedData.isMinor);
+            }, [transposedPitch, transposedKeyName, selectedStructure, effectiveTransposedData]);
 
             const pianoConcertNotes = React.useMemo(() => {
-                return generateStructureNotes(selectedPianoKey.pitch, selectedPianoKey.key, selectedStructure);
-            }, [selectedPianoKey, selectedStructure]);
+                return generateStructureNotes(selectedInputKey.pitch, selectedInputKey.key, selectedStructure, keyMode === 'minor');
+            }, [selectedInputKey, selectedStructure, keyMode]);
 
             const activeSelectedNote = activeNotes[selectedNoteIndex] || activeNotes[0];
 
@@ -566,11 +972,11 @@
             const handlePlayScale = () => {
                 if (isPlayingScale) return;
                 setIsPlayingScale(true);
-                
+
                 activeNotes.forEach((note, index) => {
                     setTimeout(() => {
                         setSelectedNoteIndex(index);
-                        playInstrumentPitch(note.frequency, 0.5, soundEngine, selectedSax.id);
+                        playInstrumentPitch(note.frequency, 0.6, soundEngine, selectedSax.id);
                         if (index === activeNotes.length - 1) {
                             setTimeout(() => setIsPlayingScale(false), 500);
                         }
@@ -579,245 +985,244 @@
             };
 
             return (
-                <div className={`min-h-screen ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} transition-colors duration-200 pb-12`}>
+                <div className={`min-h-screen p-3 md:p-6 pb-20 ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
                     
                     {/* Header Bar */}
-                    <header className={`sticky top-0 z-50 backdrop-blur-md border-b ${isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-slate-200'} px-4 py-3 shadow-md`}>
-                        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-bold text-xl shadow-lg shadow-amber-500/20">
-                                    🎷
-                                </div>
-                                <div>
-                                    <h1 className="text-lg font-bold tracking-tight leading-none flex items-center gap-2">
-                                        Transpositor <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 font-medium">Saxo & Piano</span>
-                                    </h1>
-                                    <p className="text-xs text-slate-400 mt-0.5">Transposición e interpretación armónica</p>
-                                </div>
+                    <header className="max-w-5xl mx-auto flex items-center justify-between pb-6 border-b border-slate-800 mb-6">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20">
+                                🎷
                             </div>
-
-                            <div className="flex items-center space-x-2">
-                                <div className={`flex items-center rounded-lg border p-1 text-xs ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'}`}>
-                                    <span className="text-[10px] text-slate-400 font-bold px-2 uppercase">Sonido:</span>
-                                    <button
-                                        onClick={() => setSoundEngine('piano')}
-                                        className={`px-2.5 py-1 rounded-md font-bold transition ${
-                                            soundEngine === 'piano'
-                                            ? 'bg-blue-600 text-white shadow'
-                                            : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        🎹 Grand Piano
-                                    </button>
-                                    <button
-                                        onClick={() => setSoundEngine('sax')}
-                                        className={`px-2.5 py-1 rounded-md font-bold transition ${
-                                            soundEngine === 'sax'
-                                            ? 'bg-amber-500 text-slate-950 shadow'
-                                            : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        🎷 Saxo Realista
-                                    </button>
-                                </div>
-
-                                <button
-                                    onClick={toggleTheme}
-                                    className={`p-2 rounded-lg border text-xs font-semibold transition ${
-                                        isDarkMode 
-                                        ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 text-amber-400' 
-                                        : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-700'
-                                    }`}
-                                >
-                                    {isDarkMode ? '☀️ Claro' : '🌙 Escenario'}
-                                </button>
+                            <div>
+                                <h1 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
+                                    Jag2Sax <span className="text-amber-500 text-sm md:text-base font-bold">Transpositor</span>
+                                </h1>
+                                <p className="text-xs text-slate-400">Herramienta de transposición armónica para Piano y Saxofones</p>
                             </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={() => setShowTableModal(true)}
+                                className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition flex items-center gap-1.5"
+                            >
+                                <span>📋</span>
+                                <span className="hidden sm:inline">Tabla Práctica</span>
+                            </button>
+
+                            <button
+                                onClick={toggleTheme}
+                                className={`p-2.5 rounded-xl border text-sm transition ${
+                                    isDarkMode ? 'bg-slate-900 border-slate-800 text-amber-400' : 'bg-white border-slate-200 text-slate-700'
+                                }`}
+                            >
+                                {isDarkMode ? '🌙' : '☀️'}
+                            </button>
                         </div>
                     </header>
 
-                    <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+                    {/* Practical Table Modal */}
+                    <PracticalTableModal
+                        isOpen={showTableModal}
+                        onClose={() => setShowTableModal(false)}
+                        isDarkMode={isDarkMode}
+                    />
 
-                        {/* PASO 1: SELECCIÓN DE TONALIDAD Y SAXOFÓN */}
+                    {/* Main Workspace Grid */}
+                    <main className="max-w-5xl mx-auto space-y-6">
+
+                        {/* TONALIDAD BASE E INSTRUMENTO */}
                         <section className={`p-5 rounded-2xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-2">
-                                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-xs">1</span>
-                                    <h2 className="font-bold text-base tracking-wide">Paso 1: Configura la Tonalidad de Origen</h2>
+                                    <h2 className="font-bold text-base tracking-wide">Tonalidad Base e Instrumento</h2>
                                 </div>
-                                <span className="text-xs text-slate-400">Piano Concierto $\rightarrow$ Saxo</span>
+
+                                {/* Direction Switch */}
+                                <button
+                                    onClick={() => setDirection(direction === 'pianoToSax' ? 'saxToPiano' : 'pianoToSax')}
+                                    className="text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20 transition flex items-center gap-1.5"
+                                >
+                                    <span>🔄</span>
+                                    <span>{direction === 'pianoToSax' ? 'Piano ➔ Saxofón' : 'Saxofón ➔ Piano'}</span>
+                                </button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
+                            {/* Key Quality Mode & Sound Selection Row */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                                        🎹 Tonalidad del Piano / Concierto (C)
+                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                                        Modo Armónico:
                                     </label>
-                                    <div className="grid grid-cols-7 gap-1.5">
-                                        {PIANO_KEYS.map((item) => {
-                                            const isSelected = selectedPianoKey.key === item.key;
-                                            return (
-                                                <button
-                                                    key={item.key}
-                                                    onClick={() => setSelectedPianoKey(item)}
-                                                    className={`py-2.5 rounded-lg text-sm font-bold transition flex flex-col items-center justify-center border ${
-                                                        isSelected
-                                                        ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20 scale-[1.02]'
-                                                        : isDarkMode
-                                                        ? 'bg-slate-800/80 border-slate-700 hover:bg-slate-700 text-slate-200'
-                                                        : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-800'
-                                                    }`}
-                                                >
-                                                    <span>{item.key}</span>
-                                                </button>
-                                            );
-                                        })}
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => setKeyMode('major')}
+                                            className={`py-2 rounded-xl text-xs font-bold border transition ${
+                                                keyMode === 'major'
+                                                ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
+                                                : 'bg-slate-800/60 border-slate-700 text-slate-300'
+                                            }`}
+                                        >
+                                            ☀️ Mayor
+                                        </button>
+                                        <button
+                                            onClick={() => setKeyMode('minor')}
+                                            className={`py-2 rounded-xl text-xs font-bold border transition ${
+                                                keyMode === 'minor'
+                                                ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
+                                                : 'bg-slate-800/60 border-slate-700 text-slate-300'
+                                            }`}
+                                        >
+                                            🌙 Menor
+                                        </button>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                                        🎷 Tipo de Saxofón
+                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                                        Sonido de Reproducción:
                                     </label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {SAXOPHONES.map((sax) => {
-                                            const isSelected = selectedSax.id === sax.id;
-                                            return (
-                                                <button
-                                                    key={sax.id}
-                                                    onClick={() => setSelectedSax(sax)}
-                                                    className={`p-3 rounded-xl border text-left transition flex flex-col justify-between ${
-                                                        isSelected
-                                                        ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 border-amber-400 font-bold shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/50 scale-[1.02]'
-                                                        : isDarkMode
-                                                        ? 'bg-slate-800/80 border-slate-700 hover:bg-slate-700 text-slate-200'
-                                                        : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-800'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center justify-between w-full mb-1">
-                                                        <span className="text-xl">{sax.icon}</span>
-                                                        <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
-                                                            isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-700/50 text-amber-400'
-                                                        }`}>
-                                                            {sax.key}
-                                                        </span>
-                                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => setSoundEngine('piano')}
+                                            className={`py-2 rounded-xl text-xs font-bold border transition ${
+                                                soundEngine === 'piano'
+                                                ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30'
+                                                : 'bg-slate-800/60 border-slate-700 text-slate-300'
+                                            }`}
+                                        >
+                                            🎹 German Classical
+                                        </button>
+                                        <button
+                                            onClick={() => setSoundEngine('sax')}
+                                            className={`py-2 rounded-xl text-xs font-bold border transition ${
+                                                soundEngine === 'sax'
+                                                ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
+                                                : 'bg-slate-800/60 border-slate-700 text-slate-300'
+                                            }`}
+                                        >
+                                            🎷 Saxofón Real
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Pitch Class Selector Buttons */}
+                            <div className="mb-5">
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                                    {direction === 'pianoToSax' ? 'Tonalidad en Piano (Concierto / C):' : `Tonalidad en ${selectedSax.name}:`}
+                                </label>
+                                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                                    {INPUT_KEYS.map((k, idx) => {
+                                        const isSelected = selectedInputKey.key === k.key;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setSelectedInputKey(k)}
+                                                className={`py-2.5 rounded-xl font-bold text-sm transition border ${
+                                                    isSelected
+                                                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20 font-black'
+                                                    : isDarkMode
+                                                    ? 'bg-slate-800/80 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                                    : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200'
+                                                }`}
+                                            >
+                                                {k.key}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Saxophone Selector Cards */}
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                                    Selecciona el Tipo de Saxofón:
+                                </label>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    {SAXOPHONES.map((sax) => {
+                                        const isSelected = selectedSax.id === sax.id;
+                                        return (
+                                            <button
+                                                key={sax.id}
+                                                onClick={() => setSelectedSax(sax)}
+                                                className={`p-3.5 rounded-2xl border text-left transition flex items-center justify-between ${
+                                                    isSelected
+                                                    ? 'bg-amber-500/10 border-amber-500 text-amber-400 ring-2 ring-amber-500/40'
+                                                    : isDarkMode
+                                                    ? 'bg-slate-800/50 border-slate-800 text-slate-300 hover:bg-slate-800'
+                                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                <div className="flex items-center space-x-3">
+                                                    <span className="text-2xl">{sax.icon}</span>
                                                     <div>
-                                                        <div className="text-sm font-bold leading-tight">{sax.name.replace('Saxo ', '')}</div>
-                                                        <div className={`text-[11px] mt-0.5 ${isSelected ? 'text-slate-900' : 'text-slate-400'}`}>
-                                                            Registro {sax.register}
-                                                        </div>
+                                                        <div className="font-bold text-sm text-slate-100">{sax.name}</div>
+                                                        <div className="text-[10px] text-slate-400">{sax.desc}</div>
                                                     </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+                                                </div>
+                                                <span className="text-xs font-black uppercase px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-amber-400">
+                                                    {sax.key}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
-
                             </div>
-                        </section>
 
-                        {/* RESULT BANNER & TUTORIAL TOGGLE */}
-                        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-amber-500 p-0.5 shadow-xl">
-                            <div className={`p-6 rounded-[15px] ${isDarkMode ? 'bg-slate-950/90' : 'bg-white/95'} backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-6`}>
-                                
-                                <div className="flex items-center space-x-4">
-                                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 text-3xl font-extrabold flex items-center justify-center min-w-[70px] min-h-[70px] shadow-inner">
-                                        {transposedKeyName}
-                                    </div>
-                                    <div>
-                                        <div className="text-xs uppercase font-bold tracking-wider text-amber-500">
-                                            Tonalidad Resultante para {selectedSax.name}
-                                        </div>
-                                        <h3 className="text-2xl md:text-3xl font-black tracking-tight mt-0.5">
-                                            {transposedKeyName} Mayor
-                                        </h3>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            Piano Concierto en <span className="font-semibold text-blue-400">{selectedPianoKey.key}</span> ({selectedSax.desc})
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-start md:justify-end">
-                                    <button
-                                        onClick={() => setShowTutorial(!showTutorial)}
-                                        className="px-4 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2 shadow-md shadow-indigo-600/20"
-                                    >
-                                        <span>📚 {showTutorial ? 'Ocultar Tutorial' : 'Tutorial de Tonalidad'}</span>
-                                    </button>
-
-                                    <button
-                                        onClick={handlePlayScale}
-                                        disabled={isPlayingScale}
-                                        className="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 transition flex items-center gap-2 shadow-md shadow-amber-500/20 disabled:opacity-50"
-                                    >
-                                        <span>{isPlayingScale ? '🔊 Reproduciendo...' : '▶ Escuchar Tonalidad'}</span>
-                                    </button>
-                                </div>
-
-                            </div>
-                        </section>
-
-                        {/* TUTORIAL CARD */}
-                        {showTutorial && (
-                            <section className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-indigo-500/40 text-slate-200' : 'bg-indigo-50/50 border-indigo-200 text-slate-800'} shadow-lg`}>
-                                <div className="flex items-center justify-between border-b border-indigo-500/20 pb-3 mb-4">
-                                    <h3 className="text-base font-bold text-indigo-400 flex items-center gap-2">
-                                        📖 Guía Tutorial: Interpretación en {transposedKeyName} para {selectedSax.name}
+                            {/* RESULT DISPLAY BANNER */}
+                            <div className="mt-5 p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <div>
+                                    <span className="text-[10px] uppercase font-extrabold tracking-widest text-amber-400 block">
+                                        Tonalidad Resultante {direction === 'pianoToSax' ? `para ${selectedSax.name}` : 'para Piano (Concierto)'}
+                                    </span>
+                                    <h3 className="text-2xl font-black text-slate-100 mt-0.5">
+                                        {transposedKeyName} {keyMode === 'minor' ? 'Menor' : 'Mayor'}
                                     </h3>
-                                    <button 
-                                        onClick={() => setShowTutorial(false)}
-                                        className="text-xs font-bold text-slate-400 hover:text-slate-200"
-                                    >
-                                        ✕ Cerrar
-                                    </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs leading-relaxed">
-                                    <div className={`p-3.5 rounded-xl border ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                                        <h4 className="font-extrabold text-amber-400 mb-1">1. Armadura de Clave en Saxo</h4>
-                                        <p>
-                                            Al tocar con el piano en <strong>{selectedPianoKey.key}</strong>, tu saxo leerá la tonalidad de <strong>{transposedKeyName}</strong>. 
-                                            Mantén presente la alteración de notas accidentales en tu mapa de digitación.
-                                        </p>
-                                    </div>
+                                <button
+                                    onClick={handlePlayScale}
+                                    disabled={isPlayingScale}
+                                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/30 flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    <span>{isPlayingScale ? '🔊 Reproduciendo...' : '▶ Escuchar Escala'}</span>
+                                </button>
+                            </div>
+                        </section>
 
-                                    <div className={`p-3.5 rounded-xl border ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                                        <h4 className="font-extrabold text-blue-400 mb-1">2. Consejos de Digitación</h4>
-                                        <p>
-                                            Practica el salto entre la <strong>Tónica ({activeNotes[0]?.noteName})</strong> y la <strong>Dominante ({activeNotes[4]?.noteName})</strong>. 
-                                            Utiliza aire continuo para articular de forma homogénea las notas con llave de octava.
-                                        </p>
-                                    </div>
-
-                                    <div className={`p-3.5 rounded-xl border ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-200'}`}>
-                                        <h4 className="font-extrabold text-emerald-400 mb-1">3. Acompañamiento en Piano</h4>
-                                        <p>
-                                            El pianista acompañante debe tocar sobre la base de <strong>{selectedPianoKey.key} Mayor</strong>. 
-                                            La progresión básica ii - V - I para piano en esta clave iniciará con el acorde relativo menor.
-                                        </p>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
-
-                        {/* PASO 2: ESTRUCTURAS ARMÓNICAS */}
+                        {/* ESTRUCTURAS ARMÓNICAS Y ESCALAS */}
                         <section className={`p-5 rounded-2xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-2">
-                                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-bold text-xs">2</span>
-                                    <h2 className="font-bold text-base tracking-wide">Paso 2: Menú de Estructura Armónica</h2>
+                                    <h2 className="font-bold text-base tracking-wide">Estructuras Armónicas y Escalas</h2>
                                 </div>
-                                <span className="text-xs text-slate-400">Estructura activa</span>
+                                <span className="text-xs text-slate-400">Modo: {effectiveTransposedData.isMinor ? 'Menor' : 'Mayor'}</span>
                             </div>
 
                             <div className="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
-                                {STRUCTURES.map((struct) => {
-                                    const isSelected = selectedStructure.id === struct.id;
+                                <button
+                                    onClick={() => {
+                                        setIsRelativeSelected(!isRelativeSelected);
+                                        setSelectedNoteIndex(0);
+                                    }}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition border flex items-center gap-1.5 ${
+                                        isRelativeSelected
+                                        ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-600/30'
+                                        : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20'
+                                    }`}
+                                >
+                                    <span>🔄</span>
+                                    <span>{keyMode === 'minor' ? ' Ver Relativa Mayor' : ' Ver Relativa Menor'}</span>
+                                </button>
+
+                                {activeStructures.map((struct) => {
+                                    const isSelected = !isRelativeSelected && selectedStructure.id === struct.id;
                                     return (
                                         <button
                                             key={struct.id}
                                             onClick={() => {
+                                                setIsRelativeSelected(false);
                                                 setSelectedStructure(struct);
                                                 setSelectedNoteIndex(0);
                                             }}
@@ -835,13 +1240,13 @@
                                 })}
                             </div>
 
-                            {/* NOTES GRID WITH DEGREES */}
+                            {/* DISPLAY DE NOTAS Y GRADOS */}
                             <div className="mt-6">
                                 <div className="flex items-center justify-between mb-3">
                                     <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400">
-                                        Notas y Grados de la <span className="text-amber-400">{selectedStructure.name}</span> ({transposedKeyName})
+                                        Notas y Grados de {isRelativeSelected ? <span className="text-indigo-400">Tonalidad Relativa ({transposedKeyName} {effectiveTransposedData.isMinor ? 'Menor' : 'Mayor'})</span> : <><span className="text-amber-400">{selectedStructure.name}</span> ({transposedKeyName})</>}
                                     </h4>
-                                    <span className="text-xs text-slate-400">Haz clic en una nota para ver digitación y teclado</span>
+                                    <span className="text-xs text-slate-400">Haz clic en una nota para ver digitación</span>
                                 </div>
 
                                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
@@ -852,7 +1257,7 @@
                                                 key={idx}
                                                 onClick={() => {
                                                     setSelectedNoteIndex(idx);
-                                                    playInstrumentPitch(note.frequency, 0.5, soundEngine, selectedSax.id);
+                                                    playInstrumentPitch(note.frequency, 0.6, soundEngine, selectedSax.id);
                                                 }}
                                                 className={`p-3.5 rounded-xl border flex flex-col items-center justify-between transition hover:scale-[1.03] active:scale-95 ${
                                                     isFocused
@@ -887,17 +1292,30 @@
 
                         </section>
 
-                        {/* VISUALIZADORES DUALES: TECLADO Y LLAVES DEL SAXOFÓN */}
+                        {/* PENTAGRAMA Y ESCALA EN CLAVE DE SOL */}
+                        <MusicalStaffDiagram
+                            activeNotes={activeNotes}
+                            selectedNoteIndex={selectedNoteIndex}
+                            onSelectNote={(idx, freq) => {
+                                setSelectedNoteIndex(idx);
+                                playInstrumentPitch(freq, 0.6, soundEngine, selectedSax.id);
+                            }}
+                            soundEngine={soundEngine}
+                            selectedSax={selectedSax}
+                            isDarkMode={isDarkMode}
+                        />
+
+                        {/* VISUALIZADORES DUALES: TECLADO PIANO Y DIGITACIÓN SVG SAXOFÓN */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            
-                            {/* PIANO KEYBOARD */}
+
+                            {/* Piano Keyboard */}
                             <section className={`md:col-span-2 p-5 rounded-2xl border shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <h3 className="font-bold text-base tracking-wide flex items-center gap-2">
                                             🎹 Teclado Visualizador
                                         </h3>
-                                        <p className="text-xs text-slate-400">Resaltado de notas en el piano de referencia</p>
+                                        <p className="text-xs text-slate-400">Resaltado de notas en el teclado de referencia</p>
                                     </div>
                                     <div className="flex items-center space-x-3 text-xs">
                                         <span className="flex items-center gap-1">
@@ -912,7 +1330,7 @@
                                 </div>
 
                                 <div className="relative w-full overflow-x-auto pb-2">
-                                    <div className="flex min-w-[520px] h-36 bg-slate-950 p-2 rounded-xl border border-slate-800 relative justify-center">
+                                    <div className="flex min-w-[550px] h-36 bg-slate-950 p-2 rounded-xl border border-slate-800 relative justify-center">
                                         {Array.from({ length: 24 }).map((_, keyIdx) => {
                                             const pitchClass = keyIdx % 12;
                                             const isBlack = [1, 3, 6, 8, 10].includes(pitchClass);
@@ -928,9 +1346,9 @@
                                                     onClick={() => {
                                                         const matchedIdx = activeNotes.findIndex(n => n.pitchClass === pitchClass);
                                                         if (matchedIdx !== -1) setSelectedNoteIndex(matchedIdx);
-                                                        playInstrumentPitch(getPitchFrequency(pitchClass, keyIdx < 12 ? 4 : 5), 0.5, soundEngine, selectedSax.id);
+                                                        playInstrumentPitch(getPitchFrequency(pitchClass, keyIdx < 12 ? 4 : 5), 0.6, soundEngine, selectedSax.id);
                                                     }}
-                                                    className={`relative flex-1 min-w-[28px] max-w-[40px] h-full rounded-b-md border transition-all cursor-pointer flex flex-col justify-end items-center pb-2 select-none ${
+                                                    className={`relative flex-1 min-w-[30px] max-w-[42px] h-full rounded-b-md border transition-all cursor-pointer flex flex-col justify-end items-center pb-2 select-none ${
                                                         isFocused
                                                         ? 'bg-amber-400 border-amber-300 text-slate-950 font-bold shadow-lg shadow-amber-500/40 z-10 scale-[1.02]'
                                                         : isScaleNote
@@ -945,7 +1363,7 @@
                                                                 const blackPitch = (pitchClass + 1) % 12;
                                                                 const matchedIdx = activeNotes.findIndex(n => n.pitchClass === blackPitch);
                                                                 if (matchedIdx !== -1) setSelectedNoteIndex(matchedIdx);
-                                                                playInstrumentPitch(getPitchFrequency(blackPitch, keyIdx < 12 ? 4 : 5), 0.5, soundEngine, selectedSax.id);
+                                                                playInstrumentPitch(getPitchFrequency(blackPitch, keyIdx < 12 ? 4 : 5), 0.6, soundEngine, selectedSax.id);
                                                             }}
                                                             className={`absolute top-0 -right-[40%] w-[80%] h-[60%] rounded-b-md border z-20 cursor-pointer flex items-end justify-center pb-1 transition ${
                                                                 activeSelectedNote && activeSelectedNote.pitchClass === ((pitchClass + 1) % 12)
@@ -971,20 +1389,27 @@
                                 </div>
                             </section>
 
-                            {/* SAXOPHONE KEYS DIAGRAM */}
+                            {/* Graphic SVG Saxophone Key Diagram */}
                             <section className="md:col-span-1">
-                                <SaxophoneKeysDiagram 
+                                <SaxophoneGraphicDiagram
                                     pitchClass={activeSelectedNote.pitchClass}
                                     noteName={activeSelectedNote.noteName}
+                                    usesOctaveKey={activeSelectedNote.usesOctaveKey}
                                     isDarkMode={isDarkMode}
                                 />
                             </section>
 
                         </div>
 
-                        {/* COMPARATIVE SUMMARY */}
+                        {/* GEMINI AI ASSISTANT CHAT */}
+                        <GeminiAiAssistant
+                            currentKey={transposedKeyName}
+                            currentSax={selectedSax}
+                            isDarkMode={isDarkMode}
+                        />
+
+                        {/* COMPARISON AND SUMMARY */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
                             <div className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                                 <h3 className="font-bold text-sm tracking-wide mb-3 flex items-center gap-2">
                                     🔄 Comparativa Directa Concierto vs Saxofón
@@ -1007,25 +1432,24 @@
 
                             <div className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
                                 <h3 className="font-bold text-sm tracking-wide mb-2 flex items-center gap-2">
-                                    💡 Regla Didáctica de Transposición
+                                    💡 Regla de Transposición Aplicada
                                 </h3>
                                 <div className="text-xs space-y-2 text-slate-400 leading-relaxed">
                                     <p>
-                                        <strong className="text-slate-200">Saxo Alto (Eb):</strong> Lees <span className="text-amber-400 font-bold">9 semitonos arriba (Sexta Mayor)</span>. Ejemplo: Piano en C $\rightarrow$ Saxo Alto toca A.
+                                        <strong className="text-slate-200">Ajuste Enarmónico Inteligente:</strong> Las tonalidades teóricas como Sol♯ Mayor o Re♯ Mayor se transforman automáticamente a sus equivalentes prácticos en bemol (<span className="text-amber-400 font-bold">La♭ Mayor</span> y <span className="text-amber-400 font-bold">Mi♭ Mayor</span>).
                                     </p>
                                     <p>
-                                        <strong className="text-slate-200">Saxo Soprano / Tenor (Bb):</strong> Lees <span className="text-amber-400 font-bold">2 semitonos arriba (Un Tono)</span>. Ejemplo: Piano en C $\rightarrow$ Saxo Tenor/Soprano toca D.
+                                        <strong className="text-slate-200">Bidireccional:</strong> Puedes cambiar en cualquier momento entre Piano ➔ Saxo o Saxo ➔ Piano mediante el conmutador superior.
                                     </p>
                                 </div>
                             </div>
-
                         </div>
 
                     </main>
 
                     {/* Footer */}
                     <footer className="max-w-5xl mx-auto px-4 mt-8 pt-4 border-t border-slate-800 text-center text-xs text-slate-500">
-                        Plataforma interactiva de transposición para saxofonistas, pianistas y arreglistas.
+                        Jag2Sax Transpositor - Plataforma interactiva para saxofonistas y pianistas.
                     </footer>
 
                 </div>
