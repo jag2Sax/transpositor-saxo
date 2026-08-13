@@ -69,34 +69,34 @@
     const CHROMATIC_SCALE = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
     const PRACTICAL_CHART_MAJOR = [
-      { piano: 'Do mayor (C)', soprano: 'Re mayor (D)', alto: 'La mayor (A)', tenor: 'Re mayor (D)' },
-      { piano: 'Sol mayor (G)', soprano: 'La mayor (A)', alto: 'Mi mayor (E)', tenor: 'La mayor (A)' },
-      { piano: 'Re mayor (D)', soprano: 'Mi mayor (E)', alto: 'Si mayor (B)', tenor: 'Mi mayor (E)' },
-      { piano: 'La mayor (A)', soprano: 'Si mayor (B)', alto: 'Fa# mayor (F#)', tenor: 'Si mayor (B)' },
-      { piano: 'Mi mayor (E)', soprano: 'Fa# mayor (F#)', alto: 'Re♭ mayor (Db)', tenor: 'Fa# mayor (F#)' },
-      { piano: 'Si mayor (B)', soprano: 'Re♭ mayor (Db)', alto: 'La♭ mayor (Ab)', tenor: 'Re♭ mayor (Db)' },
-      { piano: 'Fa# mayor (F#)', soprano: 'La♭ mayor (Ab)', alto: 'Mi♭ mayor (Eb)', tenor: 'La♭ mayor (Ab)' },
-      { piano: 'Fa mayor (F)', soprano: 'Sol mayor (G)', alto: 'Re mayor (D)', tenor: 'Sol mayor (G)' },
-      { piano: 'Si♭ mayor (Bb)', soprano: 'Do mayor (C)', alto: 'Sol mayor (G)', tenor: 'Do mayor (C)' },
-      { piano: 'Mi♭ mayor (Eb)', soprano: 'Fa mayor (F)', alto: 'Do mayor (C)', tenor: 'Fa mayor (F)' },
-      { piano: 'La♭ mayor (Ab)', soprano: 'Si♭ mayor (Bb)', alto: 'Fa mayor (F)', tenor: 'Si♭ mayor (Bb)' },
-      { piano: 'Re♭ mayor (Db)', soprano: 'Mi♭ mayor (Eb)', alto: 'Si♭ mayor (Bb)', tenor: 'Mi♭ mayor (Eb)' },
-      { piano: 'Sol♭ mayor (Gb)', soprano: 'La♭ mayor (Ab)', alto: 'Mi♭ mayor (Eb)', tenor: 'La♭ mayor (Ab)' }
+      { piano: 'Do mayor (C)', soprano: 'Re mayor (D)', alto: 'La mayor (A)', tenor: 'Re mayor (D)', note: 'C' },
+      { piano: 'Sol mayor (G)', soprano: 'La mayor (A)', alto: 'Mi mayor (E)', tenor: 'La mayor (A)', note: 'G' },
+      { piano: 'Re mayor (D)', soprano: 'Mi mayor (E)', alto: 'Si mayor (B)', tenor: 'Mi mayor (E)', note: 'D' },
+      { piano: 'La mayor (A)', soprano: 'Si mayor (B)', alto: 'Fa# mayor (F#)', tenor: 'Si mayor (B)', note: 'A' },
+      { piano: 'Mi mayor (E)', soprano: 'Fa# mayor (F#)', alto: 'Re♭ mayor (Db)', tenor: 'Fa# mayor (F#)', note: 'E' },
+      { piano: 'Si mayor (B)', soprano: 'Re♭ mayor (Db)', alto: 'La♭ mayor (Ab)', tenor: 'Re♭ mayor (Db)', note: 'B' },
+      { piano: 'Fa# mayor (F#)', soprano: 'La♭ mayor (Ab)', alto: 'Mi♭ mayor (Eb)', tenor: 'La♭ mayor (Ab)', note: 'F#' },
+      { piano: 'Fa mayor (F)', soprano: 'Sol mayor (G)', alto: 'Re mayor (D)', tenor: 'Sol mayor (G)', note: 'F' },
+      { piano: 'Si♭ mayor (Bb)', soprano: 'Do mayor (C)', alto: 'Sol mayor (G)', tenor: 'Do mayor (C)', note: 'Bb' },
+      { piano: 'Mi♭ mayor (Eb)', soprano: 'Fa mayor (F)', alto: 'Do mayor (C)', tenor: 'Fa mayor (F)', note: 'Eb' },
+      { piano: 'La♭ mayor (Ab)', soprano: 'Si♭ mayor (Bb)', alto: 'Fa mayor (F)', tenor: 'Si♭ mayor (Bb)', note: 'Ab' },
+      { piano: 'Re♭ mayor (Db)', soprano: 'Mi♭ mayor (Eb)', alto: 'Si♭ mayor (Bb)', tenor: 'Mi♭ mayor (Eb)', note: 'Db' },
+      { piano: 'Sol♭ mayor (Gb)', soprano: 'La♭ mayor (Ab)', alto: 'Mi♭ mayor (Eb)', tenor: 'La♭ mayor (Ab)', note: 'Gb' }
     ];
 
     const PRACTICAL_CHART_MINOR = [
-      { piano: 'La menor (Am)', soprano: 'Si menor (Bm)', alto: 'Fa# menor (F#m)', tenor: 'Si menor (Bm)' },
-      { piano: 'Mi menor (Em)', soprano: 'Fa# menor (F#m)', alto: 'Do# menor (C#m)', tenor: 'Fa# menor (F#m)' },
-      { piano: 'Si menor (Bm)', soprano: 'Do# menor (C#m)', alto: 'Sol# menor (G#m)', tenor: 'Do# menor (C#m)' },
-      { piano: 'Fa# menor (F#m)', soprano: 'Sol# menor (G#m)', alto: 'Re# menor (D#m)', tenor: 'Sol# menor (G#m)' },
-      { piano: 'Do# menor (C#m)', soprano: 'Re# menor (D#m)', alto: 'La# menor (A#m)', tenor: 'Re# menor (D#m)' },
-      { piano: 'Re menor (Dm)', soprano: 'Mi menor (Em)', alto: 'Si menor (Bm)', tenor: 'Mi menor (Em)' },
-      { piano: 'Sol menor (Gm)', soprano: 'La menor (Am)', alto: 'Mi menor (Em)', tenor: 'La menor (Am)' },
-      { piano: 'Do menor (Cm)', soprano: 'Re menor (Dm)', alto: 'La menor (Am)', tenor: 'Re menor (Dm)' },
-      { piano: 'Fa menor (Fm)', soprano: 'Sol menor (Gm)', alto: 'Re menor (Dm)', tenor: 'Sol menor (Gm)' },
-      { piano: 'Si♭ menor (Bbm)', soprano: 'Do menor (Cm)', alto: 'Sol menor (Gm)', tenor: 'Do menor (Cm)' },
-      { piano: 'Mi♭ menor (Ebm)', soprano: 'Fa menor (Fm)', alto: 'Do menor (Cm)', tenor: 'Fa menor (Fm)' },
-      { piano: 'La♭ menor (Abm)', soprano: 'Si♭ menor (Bbm)', alto: 'Fa menor (Fm)', tenor: 'Si♭ menor (Bbm)' }
+      { piano: 'La menor (Am)', soprano: 'Si menor (Bm)', alto: 'Fa# menor (F#m)', tenor: 'Si menor (Bm)', note: 'A' },
+      { piano: 'Mi menor (Em)', soprano: 'Fa# menor (F#m)', alto: 'Do# menor (C#m)', tenor: 'Fa# menor (F#m)', note: 'E' },
+      { piano: 'Si menor (Bm)', soprano: 'Do# menor (C#m)', alto: 'Sol# menor (G#m)', tenor: 'Do# menor (C#m)', note: 'B' },
+      { piano: 'Fa# menor (F#m)', soprano: 'Sol# menor (G#m)', alto: 'Re# menor (D#m)', tenor: 'Sol# menor (G#m)', note: 'F#' },
+      { piano: 'Do# menor (C#m)', soprano: 'Re# menor (D#m)', alto: 'La# menor (A#m)', tenor: 'Re# menor (D#m)', note: 'C#' },
+      { piano: 'Re menor (Dm)', soprano: 'Mi menor (Em)', alto: 'Si menor (Bm)', tenor: 'Mi menor (Em)', note: 'D' },
+      { piano: 'Sol menor (Gm)', soprano: 'La menor (Am)', alto: 'Mi menor (Em)', tenor: 'La menor (Am)', note: 'G' },
+      { piano: 'Do menor (Cm)', soprano: 'Re menor (Dm)', alto: 'La menor (Am)', tenor: 'Re menor (Dm)', note: 'C' },
+      { piano: 'Fa menor (Fm)', soprano: 'Sol menor (Gm)', alto: 'Re menor (Dm)', tenor: 'Sol menor (Gm)', note: 'F' },
+      { piano: 'Si♭ menor (Bbm)', soprano: 'Do menor (Cm)', alto: 'Sol menor (Gm)', tenor: 'Do menor (Cm)', note: 'Bb' },
+      { piano: 'Mi♭ menor (Ebm)', soprano: 'Fa menor (Fm)', alto: 'Do menor (Cm)', tenor: 'Fa menor (Fm)', note: 'Eb' },
+      { piano: 'La♭ menor (Abm)', soprano: 'Si♭ menor (Bbm)', alto: 'Fa menor (Fm)', tenor: 'Si♭ menor (Bbm)', note: 'Ab' }
     ];
 
     const TRANSPOSE_OFFSETS = {
@@ -112,12 +112,13 @@
       'E#': 'F',
       'B#': 'C',
       'C♭': 'B',
-      'F♭': 'E'
+      'F♭': 'E',
+      'Gb': 'F#'
     };
 
     function normalizeNote(note) {
       if (!note) return 'C';
-      const clean = note.replace('m', '');
+      const clean = note.replace('m', '').trim();
       return PRACTICAL_MAPPING[clean] || clean;
     }
 
@@ -469,7 +470,6 @@
 
     // --- PENTAGRAM (TREBLE CLEF) COMPONENT ---
     function TrebleClefStaff({ notes, activeNoteIndex, onSelectNote }) {
-      // Exact treble clef mapping
       const STAFF_Y_MAP = {
         'C': 85,   // 1st Ledger line below
         'C#': 85,
@@ -580,7 +580,6 @@
         let success = false;
         let resultText = "";
 
-        // Exponential backoff via Cloudflare Worker Proxy
         while (attempts < 5 && !success) {
           try {
             const response = await fetch('https://jag2sax-ai.jaguzmangonzalez.workers.dev', {
@@ -672,17 +671,20 @@
       );
     }
 
-    // --- PRACTICAL TABLE MODAL COMPONENT ---
-    function TableModal({ isOpen, onClose }) {
+    // --- PRACTICAL TABLE MODAL COMPONENT (WITH DIRECT FINGERING INTERACTION) ---
+    function TableModal({ isOpen, onClose, onSelectKey }) {
       if (!isOpen) return null;
 
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="font-bold text-amber-400 text-lg flex items-center gap-2">
-                📋 Tabla Práctica de Transposición
-              </h3>
+              <div>
+                <h3 className="font-bold text-amber-400 text-lg flex items-center gap-2">
+                  📋 Tabla Práctica de Transposición
+                </h3>
+                <p className="text-xs text-slate-400">Haz clic en cualquier tonalidad para ver su digitación en el saxofón</p>
+              </div>
               <button onClick={onClose} className="p-2 text-slate-400 hover:text-white text-xl">✕</button>
             </div>
 
@@ -701,8 +703,12 @@
                     </thead>
                     <tbody className="divide-y divide-slate-800/60 bg-slate-900">
                       {PRACTICAL_CHART_MAJOR.map((row, i) => (
-                        <tr key={i} className="hover:bg-slate-800/50">
-                          <td className="p-2.5 font-semibold text-amber-300">{row.piano}</td>
+                        <tr 
+                          key={i} 
+                          onClick={() => onSelectKey(row.note, 'Mayor')}
+                          className="hover:bg-amber-500/20 cursor-pointer transition group"
+                        >
+                          <td className="p-2.5 font-semibold text-amber-300 group-hover:text-amber-400">{row.piano} 🎷</td>
                           <td className="p-2.5">{row.soprano}</td>
                           <td className="p-2.5 text-emerald-300 font-semibold">{row.alto}</td>
                           <td className="p-2.5">{row.tenor}</td>
@@ -727,8 +733,12 @@
                     </thead>
                     <tbody className="divide-y divide-slate-800/60 bg-slate-900">
                       {PRACTICAL_CHART_MINOR.map((row, i) => (
-                        <tr key={i} className="hover:bg-slate-800/50">
-                          <td className="p-2.5 font-semibold text-amber-300">{row.piano}</td>
+                        <tr 
+                          key={i} 
+                          onClick={() => onSelectKey(row.note, 'Menor')}
+                          className="hover:bg-indigo-500/20 cursor-pointer transition group"
+                        >
+                          <td className="p-2.5 font-semibold text-amber-300 group-hover:text-indigo-300">{row.piano} 🎷</td>
                           <td className="p-2.5">{row.soprano}</td>
                           <td className="p-2.5 text-emerald-300 font-semibold">{row.alto}</td>
                           <td className="p-2.5">{row.tenor}</td>
@@ -756,7 +766,6 @@
       const [selectedStructure, setSelectedStructure] = useState('Menor Natural');
       const [activeNoteIdx, setActiveNoteIdx] = useState(0);
 
-      // Octave & Alternative Fingering Options
       const [octaveChoice, setOctaveChoice] = useState(2);
       const [isAlt, setIsAlt] = useState(false);
 
@@ -830,6 +839,15 @@
         setActiveNoteIdx(idx);
         const note = activeStructureNotes[idx].note;
         synth.playNote(note, soundType, idx >= 4 ? 5 : 4, 0.8);
+      };
+
+      const handleSelectFromTable = (note, mode) => {
+        setSelectedKey(normalizeNote(note));
+        setModeQuality(mode);
+        setSelectedStructure(mode === 'Mayor' ? 'Mayor Natural' : 'Menor Natural');
+        setActiveNoteIdx(0);
+        setIsTableOpen(false);
+        synth.playNote(normalizeNote(note), soundType, 4, 0.8);
       };
 
       const handleToggleRelative = () => {
@@ -1141,7 +1159,11 @@
           </button>
 
           {/* MODALS */}
-          <TableModal isOpen={isTableOpen} onClose={() => setIsTableOpen(false)} />
+          <TableModal 
+            isOpen={isTableOpen} 
+            onClose={() => setIsTableOpen(false)} 
+            onSelectKey={handleSelectFromTable}
+          />
           <GeminiModal isOpen={isGeminiOpen} onClose={() => setIsGeminiOpen(false)} />
 
         </div>
