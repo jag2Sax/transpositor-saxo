@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Jag2Sax Transpositor</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,7 +16,6 @@
             sax: {
               gold: '#F59E0B',
               darkGold: '#D97706',
-              pink: '#F43F5E',
               green: '#22C55E',
               darkBg: '#0F172A',
               cardBg: '#1E293B'
@@ -32,7 +31,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Custom CSS for key animations and touch interaction -->
+  <!-- Custom styles & Key animations -->
   <style>
     @keyframes keyPinkGlow {
       0%, 100% {
@@ -361,64 +360,54 @@
             Digitación Tradicional — Saxofón
           </div>
           
-          {/* Vector graphic built strictly matching digitacion saxofon_2.png */}
           <svg viewBox="0 0 200 570" className="w-48 h-[26rem] drop-shadow-md">
-            
-            {/* 1. FRONT F KEY (Top Center Circle) */}
+            {/* FRONT F KEY */}
             <circle cx="100" cy="25" r="13" {...getKeyProps(f.frontF)} />
 
-            {/* 2. OCTAVE KEY (Top-Left Polygon Wedge) */}
+            {/* OCTAVE KEY */}
             <polygon points="22,160 38,92 42,162 24,166" {...getKeyProps(f.octave)} />
 
-            {/* 3. LH MAIN STACK CIRCLES */}
+            {/* LH MAIN STACK CIRCLES */}
             <circle cx="100" cy="80" r="25" {...getKeyProps(f.lh1)} />
             <circle cx="128" cy="118" r="9" {...getKeyProps(f.bisBb)} />
             <circle cx="100" cy="148" r="25" {...getKeyProps(f.lh2)} />
             <circle cx="100" cy="222" r="25" {...getKeyProps(f.lh3)} />
 
-            {/* 4. PALM KEYS (Top Right Ovals - Palm D, Eb, F) */}
+            {/* PALM KEYS */}
             <ellipse cx="152" cy="58" rx="8" ry="19" transform="rotate(15 152 58)" {...getKeyProps(f.palmD)} />
             <ellipse cx="174" cy="82" rx="8" ry="19" transform="rotate(20 174 82)" {...getKeyProps(f.palmEb)} />
             <ellipse cx="158" cy="120" rx="8" ry="19" transform="rotate(15 158 120)" {...getKeyProps(f.palmF)} />
 
-            {/* 5. LEFT PINKY KEY TABLE (Cluster of 4 keys on the right of LH stack) */}
+            {/* LEFT PINKY KEY TABLE - EXACT 4 KEYS FROM DIGITACION SAXOFON 2 */}
             <g transform="translate(132, 204)">
-              {/* Top Oval Key: Sol# / G# Key */}
               <ellipse cx="28" cy="14" rx="27" ry="12" {...getKeyProps(f.gsKey)} />
-
-              {/* Middle Left Key: Si Grave / Low B Key */}
               <rect x="1" y="28" width="26" height="28" rx="5" {...getKeyProps(f.lowB)} />
-
-              {/* Middle Right Key: Do# Grave / Low C# Key */}
               <rect x="29" y="28" width="26" height="28" rx="5" {...getKeyProps(f.lowCs)} />
-
-              {/* Bottom Capsule Key: Si♭ Grave / Low Bb Key */}
               <rect x="1" y="58" width="54" height="24" rx="12" {...getKeyProps(f.lowBb)} />
             </g>
 
-            {/* 6. SIDE KEYS (Narrow Vertical Rectangles on Left Side of RH Stack) */}
+            {/* SIDE KEYS */}
             <g transform="translate(42, 292)">
               <rect x="0" y="0" width="11" height="38" rx="3" {...getKeyProps(f.sideE)} />
               <rect x="0" y="42" width="11" height="38" rx="3" {...getKeyProps(f.sideC)} />
               <rect x="0" y="84" width="11" height="38" rx="3" {...getKeyProps(f.sideBb)} />
             </g>
 
-            {/* 7. RH MAIN STACK CIRCLES & AUX KEYS */}
+            {/* RH MAIN STACK CIRCLES & AUX KEYS */}
             <circle cx="100" cy="310" r="25" {...getKeyProps(f.rh1)} />
             <rect x="64" y="344" width="10" height="25" rx="3" {...getKeyProps(f.sideFSharp)} />
             <circle cx="100" cy="385" r="25" {...getKeyProps(f.rh2)} />
             <rect x="52" y="422" width="10" height="25" rx="3" {...getKeyProps(f.lowC)} />
             <circle cx="100" cy="460" r="25" {...getKeyProps(f.rh3)} />
 
-            {/* 8. BOTTOM PINKY KEYS (Low Eb & Low C Stacked Capsules) */}
+            {/* BOTTOM PINKY KEYS */}
             <g transform="translate(70, 502)">
               <rect x="0" y="0" width="60" height="24" rx="12" {...getKeyProps(f.ebKey)} />
               <rect x="0" y="27" width="60" height="24" rx="12" {...getKeyProps(f.lowC)} />
             </g>
-
           </svg>
 
-          {/* CONTROLS FOR OCTAVES AND ALTERNATIVE VARIANTS */}
+          {/* OCTAVE & VARIANT CONTROLS */}
           <div className="w-full mt-3 space-y-2 border-t border-slate-800 pt-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-slate-400 font-medium">Octava:</span>
@@ -469,19 +458,19 @@
 
     function TrebleClefStaff({ notes, activeNoteIndex, onSelectNote }) {
       const STAFF_Y_MAP = {
-        'C': 85,   // 1st Ledger line below
+        'C': 85,
         'C#': 85,
         'Db': 85,
-        'D': 77.5, // Space below 1st line
+        'D': 77.5,
         'Eb': 70,
-        'E': 70,   // Line 1
-        'F': 62.5, // Space 1
+        'E': 70,
+        'F': 62.5,
         'F#': 62.5,
-        'G': 55,   // Line 2 (Clef Center)
+        'G': 55,
         'Ab': 47.5,
-        'A': 47.5, // Space 2
+        'A': 47.5,
         'Bb': 40,
-        'B': 40    // Line 3
+        'B': 40
       };
 
       return (
@@ -623,7 +612,7 @@
         };
       }, [isDragging, handlePointerMove, handlePointerUp]);
 
-      const handleClick = (e) => {
+      const handleClick = () => {
         if (!hasDraggedRef.current) {
           onClick();
         }
@@ -677,12 +666,23 @@
             });
 
             if (!response.ok) {
-              const errData = await response.json().catch(() => ({}));
-              throw new Error(errData.error?.message || `HTTP ${response.status}`);
+              let detailMsg = `HTTP ${response.status}`;
+              try {
+                const errData = await response.json();
+                if (errData.error?.message) {
+                  detailMsg = errData.error.message;
+                }
+              } catch(e) {}
+              throw new Error(detailMsg);
             }
 
             const data = await response.json();
-            resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se obtuvo respuesta.";
+            
+            if (data.error && data.error.message) {
+              resultText = `⚠️ ${data.error.message}`;
+            } else {
+              resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se obtuvo respuesta.";
+            }
             success = true;
           } catch (err) {
             attempts++;
