@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Jag2Sax Transpositor</title>
   
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,6 +16,7 @@
             sax: {
               gold: '#F59E0B',
               darkGold: '#D97706',
+              pink: '#F43F5E',
               green: '#22C55E',
               darkBg: '#0F172A',
               cardBg: '#1E293B'
@@ -31,24 +32,24 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Custom styles & Key animations -->
+  <!-- Custom CSS for key animations and touch interaction -->
   <style>
-    @keyframes keyGlow {
+    @keyframes keyPinkGlow {
       0%, 100% {
-        fill: rgba(34, 197, 94, 0.55);
-        stroke: #15803d;
-        stroke-width: 2.5px;
-        filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
+        fill: #f43f5e;
+        stroke: #be123c;
+        stroke-width: 2px;
+        filter: drop-shadow(0 0 8px rgba(244, 63, 94, 0.9));
       }
       50% {
-        fill: rgba(34, 197, 94, 0.25);
-        stroke: #22c55e;
+        fill: #fb7185;
+        stroke: #f43f5e;
         stroke-width: 1.5px;
-        filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.3));
+        filter: drop-shadow(0 0 3px rgba(244, 63, 94, 0.4));
       }
     }
     .key-active {
-      animation: keyGlow 1.2s infinite ease-in-out;
+      animation: keyPinkGlow 1.2s infinite ease-in-out;
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -57,15 +58,17 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    .touch-none {
+      touch-action: none;
+    }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200 select-none">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useRef, useMemo } = React;
+    const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-    // --- MUSIC THEORY DATA & HELPER FUNCTIONS ---
     const CHROMATIC_SCALE = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
     const PRACTICAL_CHART_MAJOR = [
@@ -147,7 +150,6 @@
       'Arpegio Dominante 7': { intervals: [0, 4, 7, 10], names: ['Tónica', 'Tercera Mayor', 'Quinta Justa', 'Séptima Menor'] }
     };
 
-    // Traditional Saxophone Fingerings Map by Octave and Variants
     const SAX_FINGERINGS_MAP = {
       'C': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, lowC: true } },
@@ -155,70 +157,81 @@
         octave3: { standard: { lh2: true, octave: true } }
       },
       'C#': {
-        octave1: { standard: {} },
+        octave1: { standard: { lowCs: true } },
         octave2: { standard: { octave: true } },
         octave3: { standard: { octave: true } }
       },
       'Db': {
-        octave1: { standard: {} },
-        octave2: { standard: { octave: true } }
+        octave1: { standard: { lowCs: true } },
+        octave2: { standard: { octave: true } },
+        octave3: { standard: { octave: true } }
       },
       'D': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true } },
         octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, octave: true } },
-        octave3: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, octave: true } }
+        octave3: { standard: { octave: true, palmD: true } }
       },
       'Eb': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, ebKey: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, ebKey: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, rh3: true, ebKey: true, octave: true } },
+        octave3: { standard: { octave: true, palmD: true, palmEb: true } }
       },
       'E': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, rh2: true, octave: true } },
+        octave3: { standard: { octave: true, palmD: true, palmEb: true, sideE: true } }
       },
       'F': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, rh1: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, rh1: true, octave: true } },
+        octave3: { standard: { octave: true, palmD: true, palmEb: true, palmF: true, sideE: true } }
       },
       'F#': {
         octave1: { 
           standard: { lh1: true, lh2: true, lh3: true, rh2: true },
-          alt: { lh1: true, lh2: true, lh3: true, rh1: true }
+          alt: { lh1: true, lh2: true, lh3: true, rh1: true, sideFSharp: true }
         },
         octave2: { 
           standard: { lh1: true, lh2: true, lh3: true, rh2: true, octave: true },
-          alt: { lh1: true, lh2: true, lh3: true, rh1: true, octave: true }
-        }
+          alt: { lh1: true, lh2: true, lh3: true, rh1: true, sideFSharp: true, octave: true }
+        },
+        octave3: { standard: { octave: true, palmD: true, palmEb: true, palmF: true, sideFSharp: true } }
       },
       'G': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, octave: true } },
+        octave3: { standard: { octave: true, frontF: true, lh1: true, lh3: true, rh1: true, sideBb: true } }
       },
       'G#': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true, octave: true } },
+        octave3: { standard: { octave: true, frontF: true, lh1: true, gsKey: true } }
       },
       'Ab': {
         octave1: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true } },
-        octave2: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, lh3: true, gsKey: true, octave: true } },
+        octave3: { standard: { octave: true, frontF: true, lh1: true, gsKey: true } }
       },
       'A': {
         octave1: { standard: { lh1: true, lh2: true } },
-        octave2: { standard: { lh1: true, lh2: true, octave: true } }
+        octave2: { standard: { lh1: true, lh2: true, octave: true } },
+        octave3: { standard: { octave: true, lh2: true, lh3: true, rh1: true, rh2: true } }
       },
       'Bb': {
         octave1: { 
           standard: { lh1: true, bisBb: true },
-          alt: { lh1: true, lh2: true, rh1: true }
+          alt: { lh1: true, lh2: true, sideBb: true }
         },
         octave2: { 
           standard: { lh1: true, bisBb: true, octave: true },
-          alt: { lh1: true, lh2: true, rh1: true, octave: true }
-        }
+          alt: { lh1: true, lh2: true, sideBb: true, octave: true }
+        },
+        octave3: { standard: { octave: true, lh1: true, rh1: true, sideBb: true } }
       },
       'B': {
         octave1: { standard: { lh1: true } },
-        octave2: { standard: { lh1: true, octave: true } }
+        octave2: { standard: { lh1: true, octave: true } },
+        octave3: { standard: { octave: true, lh1: true, lh3: true, rh1: true } }
       }
     };
 
@@ -235,7 +248,6 @@
       return { fingering, hasAltOption };
     }
 
-    // --- AUDIO SYNTHESIZER ---
     class InstrumentSynth {
       constructor() {
         this.ctx = null;
@@ -333,90 +345,77 @@
 
     const synth = new InstrumentSynth();
 
-    // --- SAXOPHONE VECTOR SVG COMPONENT ---
     function SaxFingeringDiagram({ fingering, noteName, octaveChoice, setOctaveChoice, isAlt, setIsAlt, hasAltOption }) {
       const f = fingering || {};
 
+      const getKeyProps = (isActive) => ({
+        fill: isActive ? '#f43f5e' : '#ffffff',
+        stroke: isActive ? '#be123c' : '#000000',
+        strokeWidth: isActive ? 3 : 2.5,
+        className: isActive ? 'key-active' : ''
+      });
+
       return (
         <div className="flex flex-col items-center justify-center p-4 bg-slate-900 rounded-2xl border border-slate-800 text-slate-100 shadow-xl w-full">
-          <div className="text-xs font-semibold tracking-wider text-amber-400 mb-2 uppercase">
+          <div className="text-xs font-semibold tracking-wider text-amber-400 mb-2 uppercase text-center">
             Digitación Tradicional — Saxofón
           </div>
           
-          <svg viewBox="0 0 160 380" className="w-36 h-72 drop-shadow-lg">
-            <line x1="80" y1="20" x2="80" y2="350" stroke="#334155" strokeWidth="2" strokeDasharray="4 4" />
+          {/* Vector graphic built strictly matching digitacion saxofon_2.png */}
+          <svg viewBox="0 0 200 570" className="w-48 h-[26rem] drop-shadow-md">
             
-            {/* Octave Key (TRIANGLE) */}
-            <g transform="translate(42, 55)">
-              <polygon 
-                points="0,15 15,0 15,30" 
-                fill={f.octave ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'}
-                stroke={f.octave ? '#22c55e' : '#64748b'}
-                strokeWidth="2"
-                className={f.octave ? 'key-active' : ''}
-              />
-              <text x="-12" y="18" fill="#94a3b8" fontSize="8" fontWeight="bold">8va</text>
+            {/* 1. FRONT F KEY (Top Center Circle) */}
+            <circle cx="100" cy="25" r="13" {...getKeyProps(f.frontF)} />
+
+            {/* 2. OCTAVE KEY (Top-Left Polygon Wedge) */}
+            <polygon points="22,160 38,92 42,162 24,166" {...getKeyProps(f.octave)} />
+
+            {/* 3. LH MAIN STACK CIRCLES */}
+            <circle cx="100" cy="80" r="25" {...getKeyProps(f.lh1)} />
+            <circle cx="128" cy="118" r="9" {...getKeyProps(f.bisBb)} />
+            <circle cx="100" cy="148" r="25" {...getKeyProps(f.lh2)} />
+            <circle cx="100" cy="222" r="25" {...getKeyProps(f.lh3)} />
+
+            {/* 4. PALM KEYS (Top Right Ovals - Palm D, Eb, F) */}
+            <ellipse cx="152" cy="58" rx="8" ry="19" transform="rotate(15 152 58)" {...getKeyProps(f.palmD)} />
+            <ellipse cx="174" cy="82" rx="8" ry="19" transform="rotate(20 174 82)" {...getKeyProps(f.palmEb)} />
+            <ellipse cx="158" cy="120" rx="8" ry="19" transform="rotate(15 158 120)" {...getKeyProps(f.palmF)} />
+
+            {/* 5. LEFT PINKY KEY TABLE (Cluster of 4 keys on the right of LH stack) */}
+            <g transform="translate(132, 204)">
+              {/* Top Oval Key: Sol# / G# Key */}
+              <ellipse cx="28" cy="14" rx="27" ry="12" {...getKeyProps(f.gsKey)} />
+
+              {/* Middle Left Key: Si Grave / Low B Key */}
+              <rect x="1" y="28" width="26" height="28" rx="5" {...getKeyProps(f.lowB)} />
+
+              {/* Middle Right Key: Do# Grave / Low C# Key */}
+              <rect x="29" y="28" width="26" height="28" rx="5" {...getKeyProps(f.lowCs)} />
+
+              {/* Bottom Capsule Key: Si♭ Grave / Low Bb Key */}
+              <rect x="1" y="58" width="54" height="24" rx="12" {...getKeyProps(f.lowBb)} />
             </g>
 
-            {/* Left Hand Stack */}
-            <g transform="translate(80, 75)">
-              <circle cx="-16" cy="-12" r="5" 
-                fill={f.bisBb ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.bisBb ? '#22c55e' : '#64748b'} strokeWidth="1.5" 
-                className={f.bisBb ? 'key-active' : ''} />
-              
-              <circle cx="0" cy="0" r="12" 
-                fill={f.lh1 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.lh1 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.lh1 ? 'key-active' : ''} />
-              
-              <circle cx="0" cy="30" r="12" 
-                fill={f.lh2 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.lh2 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.lh2 ? 'key-active' : ''} />
-              
-              <circle cx="0" cy="60" r="12" 
-                fill={f.lh3 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.lh3 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.lh3 ? 'key-active' : ''} />
-
-              <circle cx="18" cy="45" r="6" 
-                fill={f.gsKey ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.gsKey ? '#22c55e' : '#64748b'} strokeWidth="1.5" 
-                className={f.gsKey ? 'key-active' : ''} />
+            {/* 6. SIDE KEYS (Narrow Vertical Rectangles on Left Side of RH Stack) */}
+            <g transform="translate(42, 292)">
+              <rect x="0" y="0" width="11" height="38" rx="3" {...getKeyProps(f.sideE)} />
+              <rect x="0" y="42" width="11" height="38" rx="3" {...getKeyProps(f.sideC)} />
+              <rect x="0" y="84" width="11" height="38" rx="3" {...getKeyProps(f.sideBb)} />
             </g>
 
-            <line x1="30" y1="170" x2="130" y2="210" stroke="#475569" strokeWidth="2" />
+            {/* 7. RH MAIN STACK CIRCLES & AUX KEYS */}
+            <circle cx="100" cy="310" r="25" {...getKeyProps(f.rh1)} />
+            <rect x="64" y="344" width="10" height="25" rx="3" {...getKeyProps(f.sideFSharp)} />
+            <circle cx="100" cy="385" r="25" {...getKeyProps(f.rh2)} />
+            <rect x="52" y="422" width="10" height="25" rx="3" {...getKeyProps(f.lowC)} />
+            <circle cx="100" cy="460" r="25" {...getKeyProps(f.rh3)} />
 
-            {/* Right Hand Stack */}
-            <g transform="translate(80, 225)">
-              <circle cx="0" cy="0" r="12" 
-                fill={f.rh1 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.rh1 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.rh1 ? 'key-active' : ''} />
-              
-              <circle cx="0" cy="30" r="12" 
-                fill={f.rh2 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.rh2 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.rh2 ? 'key-active' : ''} />
-              
-              <circle cx="0" cy="60" r="12" 
-                fill={f.rh3 ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.rh3 ? '#22c55e' : '#64748b'} strokeWidth="2" 
-                className={f.rh3 ? 'key-active' : ''} />
+            {/* 8. BOTTOM PINKY KEYS (Low Eb & Low C Stacked Capsules) */}
+            <g transform="translate(70, 502)">
+              <rect x="0" y="0" width="60" height="24" rx="12" {...getKeyProps(f.ebKey)} />
+              <rect x="0" y="27" width="60" height="24" rx="12" {...getKeyProps(f.lowC)} />
             </g>
 
-            {/* Low Keys */}
-            <g transform="translate(68, 320)">
-              <rect x="0" y="0" width="24" height="12" rx="6" 
-                fill={f.ebKey ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.ebKey ? '#22c55e' : '#64748b'} strokeWidth="1.5" 
-                className={f.ebKey ? 'key-active' : ''} />
-              <rect x="0" y="16" width="24" height="12" rx="6" 
-                fill={f.lowC ? 'rgba(34, 197, 94, 0.5)' : '#1e293b'} 
-                stroke={f.lowC ? '#22c55e' : '#64748b'} strokeWidth="1.5" 
-                className={f.lowC ? 'key-active' : ''} />
-            </g>
           </svg>
 
           {/* CONTROLS FOR OCTAVES AND ALTERNATIVE VARIANTS */}
@@ -428,13 +427,13 @@
                   <button
                     key={oct}
                     onClick={() => setOctaveChoice(oct)}
-                    className={`px-2 py-1 text-[11px] font-bold rounded-md transition ${
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition ${
                       octaveChoice === oct
-                        ? 'bg-amber-500 text-slate-950'
+                        ? 'bg-rose-500 text-white shadow-md'
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                     }`}
                   >
-                    {oct === 2 ? '2ª (Δ)' : `${oct}ª`}
+                    {oct === 2 ? '2ª (8va)' : (oct === 3 ? '3ª (Aguda)' : '1ª')}
                   </button>
                 ))}
               </div>
@@ -447,7 +446,7 @@
                   <button
                     onClick={() => setIsAlt(false)}
                     className={`px-2 py-1 text-[11px] font-bold rounded-md transition ${
-                      !isAlt ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                      !isAlt ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'
                     }`}
                   >
                     Estándar
@@ -455,7 +454,7 @@
                   <button
                     onClick={() => setIsAlt(true)}
                     className={`px-2 py-1 text-[11px] font-bold rounded-md transition ${
-                      isAlt ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                      isAlt ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'
                     }`}
                   >
                     Alternativo
@@ -468,7 +467,6 @@
       );
     }
 
-    // --- PENTAGRAM (TREBLE CLEF) COMPONENT ---
     function TrebleClefStaff({ notes, activeNoteIndex, onSelectNote }) {
       const STAFF_Y_MAP = {
         'C': 85,   // 1st Ledger line below
@@ -523,7 +521,7 @@
                     cy={yPos} 
                     rx="7" 
                     ry="5" 
-                    fill={isActive ? '#38bdf8' : '#f59e0b'}
+                    fill={isActive ? '#f43f5e' : '#f59e0b'}
                     transform={`rotate(-20 ${xPos} ${yPos})`}
                     className="transition-all duration-200 group-hover:scale-125"
                   />
@@ -533,7 +531,7 @@
                     y1={yPos} 
                     x2={xPos + 6} 
                     y2={yPos - 28} 
-                    stroke={isActive ? '#38bdf8' : '#cbd5e1'} 
+                    stroke={isActive ? '#f43f5e' : '#cbd5e1'} 
                     strokeWidth="1.5" 
                   />
 
@@ -541,7 +539,7 @@
                     x={xPos} 
                     y="110" 
                     textAnchor="middle" 
-                    fill={isActive ? '#38bdf8' : '#f8fafc'} 
+                    fill={isActive ? '#f43f5e' : '#f8fafc'} 
                     fontSize="12" 
                     fontWeight="bold"
                   >
@@ -555,7 +553,97 @@
       );
     }
 
-    // --- GEMINI AI ASSISTANT MODAL (ROUTED TO CLOUDFLARE WORKER) ---
+    function DraggableAiButton({ onClick }) {
+      const [pos, setPos] = useState({ x: window.innerWidth - 180, y: window.innerHeight - 80 });
+      const [isDragging, setIsDragging] = useState(false);
+      const dragStartRef = useRef({ x: 0, y: 0 });
+      const initialPosRef = useRef({ x: 0, y: 0 });
+      const hasDraggedRef = useRef(false);
+
+      useEffect(() => {
+        const handleResize = () => {
+          setPos(prev => ({
+            x: Math.min(prev.x, window.innerWidth - 160),
+            y: Math.min(prev.y, window.innerHeight - 70)
+          }));
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+
+      const handlePointerDown = (e) => {
+        setIsDragging(true);
+        hasDraggedRef.current = false;
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
+        dragStartRef.current = { x: clientX, y: clientY };
+        initialPosRef.current = { ...pos };
+      };
+
+      const handlePointerMove = useCallback((e) => {
+        if (!isDragging) return;
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+        const dx = clientX - dragStartRef.current.x;
+        const dy = clientY - dragStartRef.current.y;
+
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+          hasDraggedRef.current = true;
+        }
+
+        const newX = Math.max(10, Math.min(window.innerWidth - 170, initialPosRef.current.x + dx));
+        const newY = Math.max(10, Math.min(window.innerHeight - 70, initialPosRef.current.y + dy));
+
+        setPos({ x: newX, y: newY });
+      }, [isDragging]);
+
+      const handlePointerUp = useCallback(() => {
+        setIsDragging(false);
+      }, []);
+
+      useEffect(() => {
+        if (isDragging) {
+          window.addEventListener('mousemove', handlePointerMove);
+          window.addEventListener('mouseup', handlePointerUp);
+          window.addEventListener('touchmove', handlePointerMove, { passive: false });
+          window.addEventListener('touchend', handlePointerUp);
+        } else {
+          window.removeEventListener('mousemove', handlePointerMove);
+          window.removeEventListener('mouseup', handlePointerUp);
+          window.removeEventListener('touchmove', handlePointerMove);
+          window.removeEventListener('touchend', handlePointerUp);
+        }
+        return () => {
+          window.removeEventListener('mousemove', handlePointerMove);
+          window.removeEventListener('mouseup', handlePointerUp);
+          window.removeEventListener('touchmove', handlePointerMove);
+          window.removeEventListener('touchend', handlePointerUp);
+        };
+      }, [isDragging, handlePointerMove, handlePointerUp]);
+
+      const handleClick = (e) => {
+        if (!hasDraggedRef.current) {
+          onClick();
+        }
+      };
+
+      return (
+        <div
+          style={{ left: `${pos.x}px`, top: `${pos.y}px` }}
+          onMouseDown={handlePointerDown}
+          onTouchStart={handlePointerDown}
+          onClick={handleClick}
+          className="fixed z-40 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold px-4 py-3 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 text-sm border border-amber-300 cursor-grab active:cursor-grabbing touch-none select-none"
+        >
+          <span className="text-base pointer-events-none">🎷</span>
+          <span className="pointer-events-none">Consultar IA</span>
+          <span className="text-xs opacity-60 pointer-events-none">⋮⋮</span>
+        </div>
+      );
+    }
+
     function GeminiModal({ isOpen, onClose }) {
       const [query, setQuery] = useState('');
       const [chatLog, setChatLog] = useState([
@@ -589,7 +677,8 @@
             });
 
             if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
+              const errData = await response.json().catch(() => ({}));
+              throw new Error(errData.error?.message || `HTTP ${response.status}`);
             }
 
             const data = await response.json();
@@ -601,7 +690,7 @@
               const delay = Math.pow(2, attempts - 1) * 1000;
               await new Promise(res => setTimeout(res, delay));
             } else {
-              resultText = "⚠️ Hubo un error al conectar con la IA. Intenta de nuevo en unos momentos.";
+              resultText = `⚠️ Error de conexión: ${err.message}`;
             }
           }
         }
@@ -671,7 +760,6 @@
       );
     }
 
-    // --- PRACTICAL TABLE MODAL COMPONENT (WITH DIRECT FINGERING INTERACTION) ---
     function TableModal({ isOpen, onClose, onSelectKey }) {
       if (!isOpen) return null;
 
@@ -754,7 +842,6 @@
       );
     }
 
-    // --- MAIN APP COMPONENT ---
     function App() {
       const [darkMode, setDarkMode] = useState(true);
 
@@ -865,6 +952,7 @@
       return (
         <div className="max-w-4xl mx-auto px-3 py-6 space-y-6">
           
+          {/* HEADER BRANDING */}
           <header className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 shadow-md">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
@@ -1149,14 +1237,8 @@
             </div>
           </section>
 
-          {/* FLOATING GEMINI AI BUTTON */}
-          <button
-            onClick={() => setIsGeminiOpen(true)}
-            className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold px-4 py-3 rounded-full shadow-2xl hover:scale-105 transition flex items-center gap-2 text-sm border border-amber-300"
-          >
-            <span>🎷</span>
-            <span>Consultar IA Musical</span>
-          </button>
+          {/* DRAGGABLE FLOATING AI BUTTON */}
+          <DraggableAiButton onClick={() => setIsGeminiOpen(true)} />
 
           {/* MODALS */}
           <TableModal 
