@@ -665,23 +665,14 @@
               body: JSON.stringify({ userMsg: userMsg })
             });
 
-            if (!response.ok) {
-              let detailMsg = `HTTP ${response.status}`;
-              try {
-                const errData = await response.json();
-                if (errData.error?.message) {
-                  detailMsg = errData.error.message;
-                }
-              } catch(e) {}
-              throw new Error(detailMsg);
-            }
-
             const data = await response.json();
             
             if (data.error && data.error.message) {
               resultText = `⚠️ ${data.error.message}`;
+            } else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              resultText = data.candidates[0].content.parts[0].text;
             } else {
-              resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se obtuvo respuesta.";
+              resultText = "No se obtuvo respuesta.";
             }
             success = true;
           } catch (err) {
