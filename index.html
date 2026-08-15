@@ -88,7 +88,7 @@
     // --- CORREO EXCLUSIVO DE ADMINISTRADOR ---
     const ADMIN_EMAIL = 'jaguzmangonzalez@gmail.com';
 
-    // --- CONFIGURACIÓN REAL DE FIREBASE DEL PROYECTO "jag2sax" ---
+    // --- CONFIGURACIÓN DE FIREBASE DEL PROYECTO "jag2sax" ---
     let firebaseConfig = {
       apiKey: "AIzaSyBJDDyzSrt5wPOV6NC4j3OpQw7T4dl_cEA",
       authDomain: "jag2sax.firebaseapp.com",
@@ -98,7 +98,6 @@
       appId: "1:180368084659:web:348169613d7fcdde7f2ac6"
     };
 
-    // Respaldo dinámico en entornos sandbox si aplicara
     if (typeof __firebase_config !== 'undefined' && __firebase_config) {
       try {
         firebaseConfig = JSON.parse(__firebase_config);
@@ -324,6 +323,7 @@
     }
     const synth = new InstrumentSynth();
 
+    // --- COMPONENTE SVG DIGITACIÓN SAXOFÓN ---
     function SaxFingeringDiagram({ fingering, octaveChoice, setOctaveChoice, isAlt, setIsAlt, hasAltOption }) {
       const f = fingering || {};
 
@@ -494,6 +494,72 @@
       );
     }
 
+    // --- FORMATEADOR DE TEXTO PARA EL CHAT DE IA ---
+    function FormattedAiText({ text }) {
+      if (!text) return null;
+
+      // Limpieza de símbolos de LaTeX a símbolos musicales nativos
+      let clean = text
+        .replace(/\$\\flat\$/g, '♭')
+        .replace(/\\flat/g, '♭')
+        .replace(/\$\\sharp\$/g, '♯')
+        .replace(/\\sharp/g, '♯');
+
+      const lines = clean.split('\n');
+
+      const renderFormattedInline = (inlineText) => {
+        const parts = inlineText.split(/(\*\*.*?\*\*|`.*?`)/g);
+        return parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-bold text-amber-300">{part.slice(2, -2)}</strong>;
+          }
+          if (part.startsWith('`') && part.endsWith('`')) {
+            return <code key={i} className="bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded text-xs font-mono">{part.slice(1, -1)}</code>;
+          }
+          return part;
+        });
+      };
+
+      return (
+        <div className="space-y-2 leading-relaxed">
+          {lines.map((line, idx) => {
+            const trimmed = line.trim();
+            if (!trimmed) return null;
+
+            if (trimmed === '---' || trimmed === '***') {
+              return <hr key={idx} className="border-slate-700 my-2" />;
+            }
+
+            if (trimmed.startsWith('#')) {
+              const headerText = trimmed.replace(/^#+\s*/, '');
+              return (
+                <h4 key={idx} className="font-bold text-amber-400 text-sm mt-3 mb-1 border-b border-slate-700/50 pb-1">
+                  {renderFormattedInline(headerText)}
+                </h4>
+              );
+            }
+
+            if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+              const bulletText = trimmed.substring(2);
+              return (
+                <div key={idx} className="flex items-start space-x-2 pl-2 my-1">
+                  <span className="text-amber-400 font-bold">•</span>
+                  <span>{renderFormattedInline(bulletText)}</span>
+                </div>
+              );
+            }
+
+            return (
+              <p key={idx} className="my-1">
+                {renderFormattedInline(trimmed)}
+              </p>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // --- MODAL ASISTENTE IA MUSICAL ---
     function GeminiModal({ isOpen, onClose }) {
       const [query, setQuery] = useState('');
       const [chatLog, setChatLog] = useState([
@@ -560,7 +626,7 @@
                       ? 'bg-amber-500 text-slate-950 font-medium rounded-br-none' 
                       : 'bg-slate-800 text-slate-100 rounded-bl-none border border-slate-700'
                   }`}>
-                    {msg.text}
+                    {msg.sender === 'user' ? msg.text : <FormattedAiText text={msg.text} />}
                   </div>
                 </div>
               ))}
@@ -679,6 +745,7 @@
       );
     }
 
+    // --- MODAL DE AUTENTICACIÓN ---
     function AuthModal({ isOpen, onClose, user }) {
       const [isSignUp, setIsSignUp] = useState(false);
       const [email, setEmail] = useState('');
@@ -899,6 +966,7 @@
       );
     }
 
+    // --- COMPONENTE PRINCIPAL ---
     function App() {
       const [user, setUser] = useState(null);
       const [usersList, setUsersList] = useState([]);
