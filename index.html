@@ -107,6 +107,12 @@
             Iniciar Sesión / Registrarse
           </button>
         </form>
+
+        <div class="pt-2 text-center">
+          <button id="btnGuestAuth" type="button" class="w-full py-2.5 px-4 bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-amber-400 font-medium rounded-xl text-xs border border-slate-700/60 transition flex items-center justify-center gap-2">
+            <span>🎷</span> Continuar como Invitado (Sin inicio de sesión)
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -874,8 +880,29 @@
     const authErrorMsg = document.getElementById('authErrorMsg');
 
     function showAuthError(msg) {
+      if (msg.includes('api-key-not-valid')) {
+        msg = "La clave API de Firebase no es válida o es de prueba. Haz clic en 'Continuar como Invitado' para usar la app ahora mismo, o coloca tu Web API Key real de Firebase Console en firebaseConfig.";
+      }
       if (authErrorMsg) authErrorMsg.textContent = msg;
       if (authError) authError.classList.remove('hidden');
+    }
+
+    const btnGuest = document.getElementById('btnGuestAuth');
+    if (btnGuest) {
+      btnGuest.onclick = () => {
+        unlockAudioIOS();
+        currentUser = {
+          uid: 'guest_' + Math.random().toString(36).substring(2, 9),
+          displayName: 'Invitado',
+          email: 'invitado@jag2sax.app',
+          isGuest: true
+        };
+        if (authModal) authModal.classList.add('hidden');
+        const userAvatar = document.getElementById('userAvatar');
+        if (userAvatar) {
+          userAvatar.src = `https://ui-avatars.com/api/?name=Invitado&background=f59e0b&color=0f172a`;
+        }
+      };
     }
 
     const btnGoogle = document.getElementById('btnGoogleAuth');
